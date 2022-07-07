@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5444/investment_assets
+    username: postgres
+    password: postgres
