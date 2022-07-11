@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ExternalExchangeService {
     List<SecurityDTO> getSecuritiesByName(String securityName);
+
+    String getServiceName();
 }

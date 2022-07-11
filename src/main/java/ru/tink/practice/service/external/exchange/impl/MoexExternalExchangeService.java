@@ -25,13 +25,16 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     @Value("${issmoex.api.url}")
     private String url;
 
+    @Value("${issmoex.api.serviceName}")
+    private String serviceName;
+
     @Override
     public List<SecurityDTO> getSecuritiesByName(String securityName) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.json", "extended")
-                .queryParam("securities.columns", "secid", "shortname", "name")
+                .queryParam("securities.columns", "secid, shortname, name")
                 .queryParam("q", securityName).build().toUri();
 
         ResponseEntity<String> securitiesJson = restTemplate.getForEntity(destUrl, String.class);
@@ -43,9 +46,15 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
             securities = mapper.readValue(root.get(1)
                     .get("securities")
                     .toString(), new TypeReference<>() {});
+            securities.forEach(security -> security.setExchangeName(serviceName));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         return securities;
+    }
+
+    @Override
+    public String getServiceName() {
+        return serviceName;
     }
 }

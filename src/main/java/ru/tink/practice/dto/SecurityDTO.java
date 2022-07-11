@@ -11,4 +11,5 @@ public class SecurityDTO {
     private String secid;
     private String shortname;
     private String name;
+    private String exchangeName;
 }
