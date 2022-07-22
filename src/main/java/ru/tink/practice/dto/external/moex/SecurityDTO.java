@@ -1,4 +1,5 @@
-package ru.tink.practice.dto;
+package ru.tink.practice.dto.external.moex;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +12,7 @@ public class SecurityDTO {
     private String secid;
     private String shortname;
     private String name;
+    private Double currentPrice;
+    private String group;
     private String exchangeName;
 }

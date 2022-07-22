@@ -6,6 +6,9 @@ spring:
 
   flyway:
     enabled: true
+  jackson:
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
 
 issmoex:
   api:
