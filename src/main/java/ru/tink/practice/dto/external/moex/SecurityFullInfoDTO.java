@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SecurityDTO {
+public class SecurityFullInfoDTO {
     private String secid;
     private String shortname;
     private String name;

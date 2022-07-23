@@ -13,6 +13,7 @@ import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,8 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     private String serviceName;
 
     @Override
-    public List<SecurityDTO> getSecuritiesByName(String securityName) {
-        List<SecurityDTO> securities =
+    public List<SecurityShortInfoDTO> getSecuritiesByName(String securityName) {
+        List<SecurityShortInfoDTO> securities =
                 getSecuritiesGroupedByType(securityName, SecurityDTOType.SHARE.getType())[1].getSecurities();
         securities.addAll(getSecuritiesGroupedByType(securityName, SecurityDTOType.BOND.getType())[1].getSecurities());
         securities.forEach(security -> security.setExchangeName(serviceName));
@@ -39,18 +40,13 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     @Override
-    public SecurityDTO getSecurityBySecid(String secid) {
-        List<Map<String, Object>> descriptions = getSecurityDescription(secid)[1].getDescriptions();
-
-        Map<String, String> json = new HashMap<>();
-        descriptions.forEach(map -> json
-                .put(map.get("name").toString().toLowerCase(), map.get("value").toString()));
-
-        SecurityDTO security = new SecurityDTO();
-        security.setSecid(json.get("secid"));
-        security.setShortname(json.get("shortname"));
-        security.setName(json.get("name"));
-        security.setGroup(json.get("group"));
+    public SecurityFullInfoDTO getSecurityBySecid(String secid) {
+        Map<String, String> descriptions = getSecurityDescription(secid);
+        SecurityFullInfoDTO security = new SecurityFullInfoDTO();
+        security.setSecid(descriptions.get("secid"));
+        security.setShortname(descriptions.get("shortname"));
+        security.setName(descriptions.get("name"));
+        security.setGroup(descriptions.get("group"));
         security.setExchangeName(serviceName);
         security.setCurrentPrice(getPrices(Engine.STOCK.getName(), Market.of(security.getGroup()), secid).get(0).getClose());
         return security;
@@ -58,7 +54,14 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
 
     @Override
     public List<PaymentDTO> getPaymentsBySecid(String secid) {
-        return null;
+        String securityGroup = getSecurityDescription(secid).get("group");
+        List<PaymentDTO> payments = new ArrayList<>();
+        if(securityGroup.contains("share")) {
+            getDividends(secid).forEach(dividend -> payments.add(dividend.toPayment()));
+        } else {
+            getCoupons(secid).forEach(coupon -> payments.add(coupon.toPayment()));
+        }
+        return payments;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return serviceName;
     }
 
-    private SecuritiesDTO[] getSecuritiesGroupedByType(String securityName, String type) {
+    private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(String securityName, String type) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities.json")
                 .queryParam("iss.meta", "off")
@@ -75,11 +78,11 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("group_by_filter", type)
                 .queryParam("group_by", "group")
                 .queryParam("q", securityName).build().toUri();
-        return restTemplate.getForObject(destUrl, SecuritiesDTO[].class);
+        return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);
     }
 
     // solve nullPointerException case
-    private SecurityDescriptionDTO[] getSecurityDescription(String secid) {
+    private Map<String, String> getSecurityDescription(String secid) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities")
                 .pathSegment(secid).pathSegment(".json")
@@ -88,7 +91,14 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("iss.only", "description")
                 .queryParam("description.columns", "name,value")
                 .build().toUri();
-        return restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class);
+        List<Map<String, Object>> descriptions =
+                restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class)[1].getDescriptions();
+
+        Map<String, String> json = new HashMap<>();
+        descriptions.forEach(map -> json
+                .put(map.get("name").toString().toLowerCase(), map.get("value").toString()));
+
+        return json;
     }
 
     // solve nullPointerException case
@@ -108,5 +118,31 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
             currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
         }
         return currentPrices.getCurrentPrices();
+    }
+
+    private List<CouponDTO> getCoupons(String secid) {
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("securities")
+                .pathSegment(secid)
+                .pathSegment("bondization.json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.json", "extended")
+                .queryParam("iss.only", "coupons")
+                .queryParam("coupons.columns", "coupondate,value_rub")
+                .build().toUri();
+
+        return restTemplate.getForObject(destUrl, CouponsDTO[].class)[1].getCoupons();
+    }
+
+    private List<DividendDTO> getDividends(String secid) {
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("securities")
+                .pathSegment(secid)
+                .pathSegment("dividends.json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.json", "extended")
+                .build().toUri();
+
+        return restTemplate.getForObject(destUrl, DividendsDTO[].class)[1].getDividends();
     }
 }

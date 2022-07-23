@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.tink.practice.entity.Payment;
 import ru.tink.practice.entity.Portfolio;
+import ru.tink.practice.enums.Exchange;
 
 import javax.persistence.*;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Security {
     private Integer quantity;
     private Double purchase_price;
     private String type;
+    private Exchange exchange;
 
     @OneToMany(mappedBy = "security", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;

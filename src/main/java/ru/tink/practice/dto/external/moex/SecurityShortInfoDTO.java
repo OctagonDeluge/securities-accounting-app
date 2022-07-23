@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentDTO {
-    private LocalDate paymentDate;
-    private Double value;
+public class SecurityShortInfoDTO {
+    private String secid;
+    private String shortname;
+    private String group;
+    private String exchangeName;
 }
