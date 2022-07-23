@@ -3,6 +3,7 @@ package ru.tink.practice.service.integration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.tink.practice.dto.external.moex.SecurityDTO;
+import ru.tink.practice.exception.NoSuchExchangeException;
 import ru.tink.practice.exception.SecurityNotFoundException;
 import ru.tink.practice.exception.SecurityNotFoundInExternalServiceException;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
@@ -29,6 +30,6 @@ public class ExchangeIntegrationService {
                 return service.getSecurityBySecid(secid);
             }
         }
-        throw new SecurityNotFoundInExternalServiceException(secid, exchangeName);
+        throw new NoSuchExchangeException(exchangeName);
     }
 }

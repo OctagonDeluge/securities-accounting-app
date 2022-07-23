@@ -40,17 +40,8 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
 
     @Override
     public SecurityDTO getSecurityBySecid(String secid) {
-        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
-                .pathSegment("securities")
-                .pathSegment(secid).pathSegment(".json")
-                .queryParam("iss.meta", "off")
-                .queryParam("iss.json", "extended")
-                .queryParam("iss.only", "description")
-                .queryParam("description.columns", "name,value")
-                .build().toUri();
+        List<Map<String, Object>> descriptions = getSecurityDescription(secid)[1].getDescriptions();
 
-        List<Map<String, Object>> descriptions = restTemplate
-                .getForObject(destUrl, SecurityDescriptionsDTO[].class)[1].getDescriptions();
         Map<String, String> json = new HashMap<>();
         descriptions.forEach(map -> json
                 .put(map.get("name").toString().toLowerCase(), map.get("value").toString()));
@@ -87,6 +78,20 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return restTemplate.getForObject(destUrl, SecuritiesDTO[].class);
     }
 
+    // solve nullPointerException case
+    private SecurityDescriptionDTO[] getSecurityDescription(String secid) {
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("securities")
+                .pathSegment(secid).pathSegment(".json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.json", "extended")
+                .queryParam("iss.only", "description")
+                .queryParam("description.columns", "name,value")
+                .build().toUri();
+        return restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class);
+    }
+
+    // solve nullPointerException case
     private List<CurrentPriceDTO> getPrices(String engine, String market, String secid) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("engines").pathSegment(engine)
