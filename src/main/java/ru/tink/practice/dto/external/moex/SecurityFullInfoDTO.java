@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SecurityFullInfoDTO {
     private String secid;
-    private String shortname;
     private String name;
     private Double currentPrice;
     private String group;

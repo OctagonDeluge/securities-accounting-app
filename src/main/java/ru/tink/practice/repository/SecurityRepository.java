@@ -8,7 +8,7 @@ import ru.tink.practice.entity.Security;
 import java.util.List;
 
 @Repository
-public interface SecurityRepository extends JpaRepository<Security, Integer> {
+public interface SecurityRepository extends JpaRepository<Security, Long> {
 
-    List<Security> findAllByPortfolioId(Integer portfolio_id);
+    List<Security> findAllByPortfolioId(Long portfolio_id);
 }

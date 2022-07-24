@@ -1,4 +1,4 @@
-package ru.tink.practice.service.external.exchange.impl.moex;
+package ru.tink.practice.service.external.exchange.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,6 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         Map<String, String> descriptions = getSecurityDescription(secid);
         SecurityFullInfoDTO security = new SecurityFullInfoDTO();
         security.setSecid(descriptions.get("secid"));
-        security.setShortname(descriptions.get("shortname"));
         security.setName(descriptions.get("name"));
         security.setGroup(descriptions.get("group"));
         security.setExchangeName(serviceName);
@@ -110,7 +109,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .pathSegment("candles.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.reverse", "true")
-                .queryParam("from", LocalDate.now().minusDays(1))
+                .queryParam("from", LocalDate.now().minusDays(3))
                 .queryParam("iss.json", "extended")
                 .queryParam("candles.columns", "close,end").build().toUri();
         CurrentPricesDTO currentPrices = restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
