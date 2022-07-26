@@ -20,8 +20,8 @@ public class ExchangeController {
         return exchangeIntegrationService.loadSecurities(securityName);
     }
 
-    @GetMapping("/{secid}")
-    public SecurityFullInfoDTO getSecurityBySecid(@PathVariable String secid, @RequestParam String exchangeName) {
+    @GetMapping("{exchangeName}/security/{secid}")
+    public SecurityFullInfoDTO getSecurityBySecid(@PathVariable String exchangeName, @PathVariable String secid) {
         return exchangeIntegrationService.getSecurityBySecid(secid, exchangeName);
     }
 }
