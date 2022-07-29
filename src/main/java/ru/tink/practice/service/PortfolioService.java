@@ -14,7 +14,7 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
 
     public void savePortfolio(String portfolioName) {
-        portfolioRepository.save(new Portfolio(portfolioName));
+        portfolioRepository.save(new Portfolio(portfolioName, 0.0));
     }
 
     public List<Portfolio> getAllPortfolios() {

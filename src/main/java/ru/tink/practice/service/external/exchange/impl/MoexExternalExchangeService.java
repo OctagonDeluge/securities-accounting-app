@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.tink.practice.dto.external.moex.*;
-import ru.tink.practice.enums.external.moex.Engine;
-import ru.tink.practice.enums.external.moex.Market;
-import ru.tink.practice.enums.external.moex.SecurityDTOType;
+import ru.tink.practice.enumeration.external.moex.Engine;
+import ru.tink.practice.enumeration.external.moex.Market;
+import ru.tink.practice.enumeration.external.moex.SecurityDTOType;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.net.URI;
@@ -47,7 +47,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         security.setName(descriptions.get("name"));
         security.setGroup(descriptions.get("group"));
         security.setExchangeName(serviceName);
-        security.setCurrentPrice(getPrices(Engine.STOCK.getName(), Market.of(security.getGroup()), secid).get(0).getClose());
+        security.setCurrentPrice(getCurrentSecurityPrice(secid, security.getGroup()));
         return security;
     }
 
@@ -64,17 +64,43 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     @Override
+    public Double getCurrentSecurityPrice(String secid, String type) {
+        return getPrices(Engine.STOCK.getName(), Market.of(type), secid)
+                .get(0).getClose();
+    }
+
+    @Override
+    public List<CurrentPriceDTO> getPricesForNumberOfDays(Long numberOfDays, String secid, String securityType) {
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("engines").pathSegment(Engine.STOCK.getName())
+                .pathSegment("markets").pathSegment(Market.of(securityType))
+                .pathSegment("securities").pathSegment(secid)
+                .pathSegment("candles.json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.reverse", "true")
+                .queryParam("from", LocalDate.now().minusDays(numberOfDays))
+                .queryParam("iss.json", "extended")
+                .queryParam("candles.columns", "close,end").build().toUri();
+
+        CurrentPricesDTO currentPrices = restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
+        if(Market.of(securityType).equals("bonds")) {
+            currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
+        }
+        return currentPrices.getCurrentPrices();
+    }
+
+    @Override
     public String getServiceName() {
         return serviceName;
     }
 
-    private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(String securityName, String type) {
+    private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(String securityName, String securityType) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.json", "extended")
                 .queryParam("securities.columns", "secid,shortname,name,group")
-                .queryParam("group_by_filter", type)
+                .queryParam("group_by_filter", securityType)
                 .queryParam("group_by", "group")
                 .queryParam("q", securityName).build().toUri();
         return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);

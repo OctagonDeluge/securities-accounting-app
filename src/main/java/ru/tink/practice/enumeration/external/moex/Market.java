@@ -1,4 +1,4 @@
-package ru.tink.practice.enums.external.moex;
+package ru.tink.practice.enumeration.external.moex;
 
 public enum Market {
     BONDS("bonds"),

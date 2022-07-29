@@ -15,12 +15,14 @@ public class Portfolio {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private Double profit;
 
     @JsonIgnore
     @OneToMany(mappedBy = "portfolio")
     private List<Security> securities;
 
-    public Portfolio(String name) {
+    public Portfolio(String name, Double profit) {
         this.name = name;
+        this.profit = profit;
     }
 }

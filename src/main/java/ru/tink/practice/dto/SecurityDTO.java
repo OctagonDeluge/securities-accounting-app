@@ -9,7 +9,7 @@ public class SecurityDTO {
     private String secid;
     private String name;
     private Integer quantity;
-    private Double purchase_price;
+    private Double purchasePrice;
     private String type;
     private String exchange;
     private Long portfolioId;

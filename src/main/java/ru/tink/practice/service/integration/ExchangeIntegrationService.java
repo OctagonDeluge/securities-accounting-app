@@ -2,6 +2,7 @@ package ru.tink.practice.service.integration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.tink.practice.dto.external.moex.CurrentPriceDTO;
 import ru.tink.practice.dto.external.moex.PaymentDTO;
 import ru.tink.practice.dto.external.moex.SecurityFullInfoDTO;
 import ru.tink.practice.dto.external.moex.SecurityShortInfoDTO;
@@ -38,6 +39,26 @@ public class ExchangeIntegrationService {
                 exchangeServices) {
             if(service.getServiceName().equals(exchangeName)) {
                 return service.getPaymentsBySecid(secid);
+            }
+        }
+        throw new NoSuchExchangeException(exchangeName);
+    }
+
+    public Double getCurrentSecurityPrice(String secid, String securityType, String exchangeName) {
+        for (ExternalExchangeService service:
+                exchangeServices) {
+            if(service.getServiceName().equals(exchangeName)) {
+                return service.getCurrentSecurityPrice(secid, securityType);
+            }
+        }
+        throw new NoSuchExchangeException(exchangeName);
+    }
+
+    public List<CurrentPriceDTO> getPricesForNumberOfDays(String secid, String exchangeName, Long numberOfDays, String securityType) {
+        for (ExternalExchangeService service:
+                exchangeServices) {
+            if(service.getServiceName().equals(exchangeName)) {
+                return service.getPricesForNumberOfDays(numberOfDays, secid, securityType);
             }
         }
         throw new NoSuchExchangeException(exchangeName);

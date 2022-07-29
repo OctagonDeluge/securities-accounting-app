@@ -1,22 +1,22 @@
-package ru.tink.practice.enums;
+package ru.tink.practice.enumeration;
 
 public enum SecurityType {
-    SHARE("share"),
-    BOND("bond");
+    SHARE("shares"),
+    BOND("bonds");
 
-    private final String type;
+    private final String name;
 
-    SecurityType(String type) {
-        this.type = type;
+    SecurityType(String name) {
+        this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
     public static SecurityType of(String anotherType) {
         for(SecurityType type:values()) {
-            if(anotherType.contains(type.getType())) {
+            if(anotherType.contains(type.getName())) {
                 return type;
             }
         }
