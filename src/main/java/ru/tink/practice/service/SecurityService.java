@@ -31,6 +31,7 @@ public class SecurityService {
             security = new Security();
             security.setSecid(securityDTO.getSecid());
             security.setName(securityDTO.getName());
+            //set current price
             security.setProfit(0.0);
             security.setExchange(Exchange.of(securityDTO.getExchange()));
             security.setType(SecurityType.of(securityDTO.getType()));
@@ -49,7 +50,7 @@ public class SecurityService {
         List<SecurityResponseDTO> securities = new ArrayList<>();
         securityRepository.findAllByPortfolioId(portfolioId)
                 .forEach(security -> {
-                    securities.add(security.toDto());
+                    securities.add(new SecurityResponseDTO(security));
                 });
         return securities;
     }
@@ -59,8 +60,7 @@ public class SecurityService {
     }
 
     public SecurityResponseDTO getSecurity(Long id) {
-        return securityRepository.findById(id)
-                .orElseThrow(() -> new SecurityNotFoundException(id))
-                .toDto();
+        return new SecurityResponseDTO(securityRepository.findById(id)
+                .orElseThrow(() -> new SecurityNotFoundException(id)));
     }
 }

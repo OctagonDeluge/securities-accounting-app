@@ -15,6 +15,7 @@ public class Portfolio {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private Double currentPrice;
     private Double profit;
 
     @JsonIgnore

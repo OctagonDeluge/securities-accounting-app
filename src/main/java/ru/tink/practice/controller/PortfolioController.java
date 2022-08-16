@@ -22,12 +22,7 @@ public class PortfolioController {
     }
 
     @PostMapping
-    public void createPortfolio(@RequestParam String portfolioName) {
-        portfolioService.savePortfolio(portfolioName);
-    }
-
-    @GetMapping("/test")
-    public void test() {
-        profitCalculationService.calculateProfit();
+    public Portfolio createPortfolio(@RequestParam String portfolioName) {
+        return portfolioService.savePortfolio(portfolioName);
     }
 }

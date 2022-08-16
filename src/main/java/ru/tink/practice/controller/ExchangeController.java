@@ -15,8 +15,8 @@ public class ExchangeController {
 
     private final ExchangeIntegrationService exchangeIntegrationService;
 
-    @GetMapping
-    public List<SecurityShortInfoDTO> getSecuritiesByName(@RequestParam String securityName) {
+    @GetMapping("/{securityName}")
+    public List<SecurityShortInfoDTO> getSecuritiesByName(@PathVariable String securityName) {
         return exchangeIntegrationService.loadSecurities(securityName);
     }
 

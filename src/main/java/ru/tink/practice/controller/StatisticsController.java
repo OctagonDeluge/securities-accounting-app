@@ -8,6 +8,7 @@ import ru.tink.practice.service.SecurityService;
 import ru.tink.practice.service.integration.ExchangeIntegrationService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,10 +20,9 @@ public class StatisticsController {
     @GetMapping("exchange/{exchangeName}/security/{secid}")
     public List<CurrentPriceDTO> getPricesForNumberOfDays(@PathVariable String exchangeName,
                                                           @PathVariable String secid,
-                                                          @RequestParam String securityType,
-                                                          @RequestParam Long numberOfDays) {
+                                                          @RequestParam Map<String, String> params) {
         return exchangeIntegrationService
-                .getPricesForNumberOfDays(secid, exchangeName, numberOfDays, securityType);
+                .getPricesForNumberOfDays(secid, exchangeName, params);
     }
 
     @GetMapping("portfolio/{portfolioId}")

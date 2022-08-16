@@ -11,6 +11,7 @@ import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -54,11 +55,11 @@ public class ExchangeIntegrationService {
         throw new NoSuchExchangeException(exchangeName);
     }
 
-    public List<CurrentPriceDTO> getPricesForNumberOfDays(String secid, String exchangeName, Long numberOfDays, String securityType) {
+    public List<CurrentPriceDTO> getPricesForNumberOfDays(String secid, String exchangeName, Map<String, String> params) {
         for (ExternalExchangeService service:
                 exchangeServices) {
             if(service.getServiceName().equals(exchangeName)) {
-                return service.getPricesForNumberOfDays(numberOfDays, secid, securityType);
+                return service.getPriceStatisticsByNumberOfDays(secid, params);
             }
         }
         throw new NoSuchExchangeException(exchangeName);

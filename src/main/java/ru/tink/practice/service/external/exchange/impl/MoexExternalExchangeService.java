@@ -1,6 +1,7 @@
 package ru.tink.practice.service.external.exchange.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,14 +13,17 @@ import ru.tink.practice.enumeration.external.moex.SecurityDTOType;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.net.URI;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MoexExternalExchangeService implements ExternalExchangeService {
 
     private final RestTemplate restTemplate;
@@ -64,13 +68,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     @Override
-    public Double getCurrentSecurityPrice(String secid, String type) {
-        return getPrices(Engine.STOCK.getName(), Market.of(type), secid)
-                .get(0).getClose();
-    }
-
-    @Override
-    public List<CurrentPriceDTO> getPricesForNumberOfDays(Long numberOfDays, String secid, String securityType) {
+    public Double getCurrentSecurityPrice(String secid, String securityType) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("engines").pathSegment(Engine.STOCK.getName())
                 .pathSegment("markets").pathSegment(Market.of(securityType))
@@ -78,15 +76,33 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .pathSegment("candles.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.reverse", "true")
-                .queryParam("from", LocalDate.now().minusDays(numberOfDays))
+                .queryParam("from", LocalDate.now().minusDays(3))
                 .queryParam("iss.json", "extended")
                 .queryParam("candles.columns", "close,end").build().toUri();
+        return getPrices(destUrl, securityType).get(0).getClose();
+    }
 
-        CurrentPricesDTO currentPrices = restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
-        if(Market.of(securityType).equals("bonds")) {
-            currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
+    @Override
+    public List<CurrentPriceDTO> getPriceStatisticsByNumberOfDays(String secid, Map<String, String> params) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("engines").pathSegment(Engine.STOCK.getName())
+                .pathSegment("markets").pathSegment(Market.of(params.get("securityType")))
+                .pathSegment("securities").pathSegment(secid)
+                .pathSegment("candles.json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.reverse", "false")
+                .queryParam("iss.json", "extended")
+                .queryParam("candles.columns", "close,end")
+                .queryParam("from", formatter.format(new Date(Long.parseLong(params.get("fromDate")))))
+                .queryParam("till", formatter.format(new Date(Long.parseLong(params.get("tillDate")))))
+                .queryParam("interval", Integer.parseInt(params.get("dayInterval"))).build().toUri();
+        List<CurrentPriceDTO> prices =
+                restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1].getCurrentPrices();
+        if(Market.of(params.get("securityType")).equals("bonds")) {
+            prices.forEach(CurrentPriceDTO::fixCloseForBond);
         }
-        return currentPrices.getCurrentPrices();
+        return prices;
     }
 
     @Override
@@ -127,19 +143,10 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     // solve nullPointerException case
-    private List<CurrentPriceDTO> getPrices(String engine, String market, String secid) {
-        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
-                .pathSegment("engines").pathSegment(engine)
-                .pathSegment("markets").pathSegment(market)
-                .pathSegment("securities").pathSegment(secid)
-                .pathSegment("candles.json")
-                .queryParam("iss.meta", "off")
-                .queryParam("iss.reverse", "true")
-                .queryParam("from", LocalDate.now().minusDays(3))
-                .queryParam("iss.json", "extended")
-                .queryParam("candles.columns", "close,end").build().toUri();
-        CurrentPricesDTO currentPrices = restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
-        if(market.equals("bonds")) {
+    private List<CurrentPriceDTO> getPrices(URI destUrl, String securityType) {
+        CurrentPricesDTO currentPrices =
+                restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
+        if(Market.of(securityType).equals("bonds")) {
             currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
         }
         return currentPrices.getCurrentPrices();

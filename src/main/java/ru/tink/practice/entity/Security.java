@@ -21,6 +21,7 @@ public class Security {
     private Long id;
     private String secid;
     private String name;
+    private Double currentPrice;
     private Double profit;
 
     @Enumerated(EnumType.STRING)
@@ -35,20 +36,4 @@ public class Security {
 
     @OneToMany(mappedBy = "security")
     private List<PurchaseInfo> purchaseInfos;
-
-    public SecurityResponseDTO toDto() {
-        SecurityResponseDTO responseDTO = new SecurityResponseDTO();
-        List<PurchaseInfoDTO> purchaseInfosId = new ArrayList<>();
-
-        responseDTO.setId(id);
-        responseDTO.setSecid(secid);
-        responseDTO.setName(name);
-        responseDTO.setProfit(profit);
-        responseDTO.setType(type);
-        responseDTO.setExchange(exchange);
-        purchaseInfos.forEach(info -> purchaseInfosId.add(info.toDTO()));
-        responseDTO.setPurchaseInfos(purchaseInfosId);
-
-        return responseDTO;
-    }
 }
