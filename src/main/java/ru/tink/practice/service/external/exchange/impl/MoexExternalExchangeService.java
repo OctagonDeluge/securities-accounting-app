@@ -7,18 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.tink.practice.dto.external.moex.*;
+import ru.tink.practice.enumeration.Currency;
+import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.enumeration.external.moex.Engine;
 import ru.tink.practice.enumeration.external.moex.Market;
 import ru.tink.practice.enumeration.external.moex.SecurityDTOType;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
+import java.math.BigDecimal;
 import java.net.URI;
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -33,6 +32,11 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
 
     @Value("${issmoex.api.serviceName}")
     private String serviceName;
+
+    private final String SECURITY_TYPE_KEY = "securityType";
+    private final String FROM_DATE_KEY = "fromDate";
+    private final String TILL_DATE_KEY = "tillDate";
+    private final String DAY_INTERVAL_KEY = "dayInterval";
 
     @Override
     public List<SecurityShortInfoDTO> getSecuritiesByName(String securityName) {
@@ -52,6 +56,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         security.setGroup(descriptions.get("group"));
         security.setExchangeName(serviceName);
         security.setCurrentPrice(getCurrentSecurityPrice(secid, security.getGroup()));
+        security.setCurrency(Currency.RUB);
         return security;
     }
 
@@ -59,7 +64,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     public List<PaymentDTO> getPaymentsBySecid(String secid) {
         String securityGroup = getSecurityDescription(secid).get("group");
         List<PaymentDTO> payments = new ArrayList<>();
-        if(securityGroup.contains("share")) {
+        if(securityGroup.contains(SecurityType.SHARE.getName())) {
             getDividends(secid).forEach(dividend -> payments.add(dividend.toPayment()));
         } else {
             getCoupons(secid).forEach(coupon -> payments.add(coupon.toPayment()));
@@ -68,7 +73,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     @Override
-    public Double getCurrentSecurityPrice(String secid, String securityType) {
+    public BigDecimal getCurrentSecurityPrice(String secid, String securityType) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("engines").pathSegment(Engine.STOCK.getName())
                 .pathSegment("markets").pathSegment(Market.of(securityType))
@@ -87,21 +92,22 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("engines").pathSegment(Engine.STOCK.getName())
-                .pathSegment("markets").pathSegment(Market.of(params.get("securityType")))
+                .pathSegment("markets").pathSegment(Market.of(params.get(SECURITY_TYPE_KEY)))
                 .pathSegment("securities").pathSegment(secid)
                 .pathSegment("candles.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.reverse", "false")
                 .queryParam("iss.json", "extended")
                 .queryParam("candles.columns", "close,end")
-                .queryParam("from", formatter.format(new Date(Long.parseLong(params.get("fromDate")))))
-                .queryParam("till", formatter.format(new Date(Long.parseLong(params.get("tillDate")))))
-                .queryParam("interval", Integer.parseInt(params.get("dayInterval"))).build().toUri();
+                .queryParam("from", formatter.format(new Date(Long.parseLong(params.get(FROM_DATE_KEY)))))
+                .queryParam("till", formatter.format(new Date(Long.parseLong(params.get(TILL_DATE_KEY)))))
+                .queryParam("interval", Integer.parseInt(params.get(DAY_INTERVAL_KEY))).build().toUri();
         List<CurrentPriceDTO> prices =
                 restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1].getCurrentPrices();
-        if(Market.of(params.get("securityType")).equals("bonds")) {
+        if(Market.of(params.get(SECURITY_TYPE_KEY)).equals(SecurityType.BOND.getName())) {
             prices.forEach(CurrentPriceDTO::fixCloseForBond);
         }
+        prices.forEach(price -> price.setCurrency(Currency.RUB));
         return prices;
     }
 
@@ -132,13 +138,13 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("iss.only", "description")
                 .queryParam("description.columns", "name,value")
                 .build().toUri();
-        List<Map<String, Object>> descriptions =
-                restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class)[1].getDescriptions();
 
+        SecurityDescriptionDTO[] test = restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class);
+        List<Map<String, Object>> descriptions =
+                test[1].getDescriptions();
         Map<String, String> json = new HashMap<>();
         descriptions.forEach(map -> json
                 .put(map.get("name").toString().toLowerCase(), map.get("value").toString()));
-
         return json;
     }
 
@@ -146,9 +152,10 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     private List<CurrentPriceDTO> getPrices(URI destUrl, String securityType) {
         CurrentPricesDTO currentPrices =
                 restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
-        if(Market.of(securityType).equals("bonds")) {
+        if(Market.of(securityType).equals(SecurityType.BOND.getName())) {
             currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
         }
+        currentPrices.getCurrentPrices().forEach(price -> price.setCurrency(Currency.RUB));
         return currentPrices.getCurrentPrices();
     }
 
@@ -160,7 +167,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.json", "extended")
                 .queryParam("iss.only", "coupons")
-                .queryParam("coupons.columns", "coupondate,value_rub")
+                .queryParam("coupons.columns", "coupondate,value_rub,faceunit")
                 .build().toUri();
 
         return restTemplate.getForObject(destUrl, CouponsDTO[].class)[1].getCoupons();

@@ -27,34 +27,34 @@ public class ProfitCalculationService {
     public void calculateProfit() {
         List<Portfolio> portfolios = portfolioRepository.findAll();
         for (Portfolio portfolio : portfolios) {
-            double portfolioProfit = 0.0;
-            double portfolioPrice = 0.0;
+            BigDecimal portfolioProfit = BigDecimal.valueOf(0);
+            BigDecimal portfolioPrice = BigDecimal.valueOf(0);
             List<Security> securities =
                     securityRepository.findAllByPortfolioId(portfolio.getId());
             for (Security security : securities) {
-                double securityProfit = 0.0;
-                double securityPrice = 0.0;
-                Double currentSecurityPrice = exchangeIntegrationService
+                BigDecimal securityProfit = BigDecimal.valueOf(0);
+                BigDecimal securityPrice = BigDecimal.valueOf(0);
+                BigDecimal currentSecurityPrice = exchangeIntegrationService
                         .getCurrentSecurityPrice(security.getSecid(),
                                 security.getType().getName(),
                                 security.getExchange().getName());
                 log.info(currentSecurityPrice.toString());
                 for(PurchaseInfo purchaseInfo: security.getPurchaseInfos()) {
                     //BigDecimal
-                    double purchaseProfit
-                            = (currentSecurityPrice - purchaseInfo.getPrice())*purchaseInfo.getQuantity();
-                    log.info(Double.toString(purchaseProfit));
-                    securityProfit += purchaseProfit;
-                    securityPrice += purchaseInfo.getPrice()*purchaseInfo.getQuantity();
+                    BigDecimal purchaseProfit
+                            = (currentSecurityPrice.subtract(purchaseInfo.getPrice())).multiply(BigDecimal.valueOf(purchaseInfo.getQuantity()));
+                    log.info(purchaseInfo.toString());
+                    securityProfit = securityProfit.add(purchaseProfit);
+                    securityPrice = securityPrice.add(purchaseInfo.getPrice().multiply(BigDecimal.valueOf(purchaseInfo.getQuantity())));
                 }
-                security.setCurrentPrice(currentSecurityPrice);
+                security.setTotalCost(currentSecurityPrice);
                 security.setProfit(securityProfit);
                 log.info(security.getProfit().toString());
                 securityRepository.save(security);
-                portfolioPrice += securityPrice;
-                portfolioProfit += securityProfit;
+                portfolioPrice = portfolioPrice.add(securityPrice);
+                portfolioProfit = portfolioProfit.add(securityProfit);
             }
-            portfolio.setCurrentPrice(portfolioPrice);
+            portfolio.setTotalCost(portfolioPrice);
             portfolio.setProfit(portfolioProfit);
             log.info(portfolio.getProfit().toString());
             portfolioRepository.save(portfolio);

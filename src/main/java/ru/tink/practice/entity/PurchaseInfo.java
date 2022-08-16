@@ -3,8 +3,10 @@ package ru.tink.practice.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.tink.practice.enumeration.Currency;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,10 +16,13 @@ import java.time.LocalDateTime;
 public class PurchaseInfo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    Long id;
-    LocalDateTime purchaseDate;
-    Double price;
-    Integer quantity;
+    private Long id;
+    private LocalDateTime purchaseDate;
+    private BigDecimal price;
+    private Integer quantity;
+
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @JsonIgnore
     @ManyToOne

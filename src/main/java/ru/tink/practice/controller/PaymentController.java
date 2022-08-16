@@ -14,8 +14,8 @@ public class PaymentController {
 
     private final ExchangeIntegrationService exchangeIntegrationService;
 
-    @GetMapping("/security/{secid}")
-    public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid, @RequestParam String exchangeName) {
+    @GetMapping("exchange/{exchangeName}/security/{secid}")
+    public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid, @PathVariable String exchangeName) {
         return exchangeIntegrationService.getPaymentsBySecid(secid, exchangeName);
     }
 }

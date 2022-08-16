@@ -9,6 +9,7 @@ import ru.tink.practice.dto.external.moex.SecurityShortInfoDTO;
 import ru.tink.practice.exception.NoSuchExchangeException;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class ExchangeIntegrationService {
         throw new NoSuchExchangeException(exchangeName);
     }
 
-    public Double getCurrentSecurityPrice(String secid, String securityType, String exchangeName) {
+    public BigDecimal getCurrentSecurityPrice(String secid, String securityType, String exchangeName) {
         for (ExternalExchangeService service:
                 exchangeServices) {
             if(service.getServiceName().equals(exchangeName)) {

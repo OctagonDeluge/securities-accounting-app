@@ -15,9 +15,9 @@ public class SecurityController {
 
     private final SecurityService securityService;
 
-    @GetMapping("/portfolio/{portfolioId}")
-    public List<SecurityResponseDTO> getSecurities(@PathVariable Long portfolioId) {
-        return securityService.getSecurities(portfolioId);
+    @GetMapping("/portfolio/{id}")
+    public List<SecurityResponseDTO> getSecurities(@PathVariable Long id) {
+        return securityService.getSecurities(id);
     }
 
     @GetMapping("/{id}")
@@ -28,5 +28,10 @@ public class SecurityController {
     @PostMapping
     public void addSecurity(@RequestBody SecurityDTO security) {
         securityService.saveSecurity(security);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteSecurity(@PathVariable Long id) {
+        securityService.deleteSecurity(id);
     }
 }

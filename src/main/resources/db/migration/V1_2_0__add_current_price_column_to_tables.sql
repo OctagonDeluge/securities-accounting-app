@@ -1,5 +1,5 @@
 alter table portfolio
-add column current_price double precision;
+add column total_cost decimal;
 
 alter table security
-add column current_price double precision;
+add column total_cost decimal;

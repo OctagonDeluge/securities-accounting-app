@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.tink.practice.entity.Security;
+import ru.tink.practice.enumeration.Currency;
 import ru.tink.practice.enumeration.Exchange;
 import ru.tink.practice.enumeration.SecurityType;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +19,11 @@ public class SecurityResponseDTO {
     private Long id;
     private String secid;
     private String name;
-    private Double currentPrice;
-    private Double profit;
+    private BigDecimal totalCost;
+    private BigDecimal profit;
     private SecurityType type;
     private Exchange exchange;
+    private Currency currency;
     private List<PurchaseInfoDTO> purchaseInfos;
 
     public SecurityResponseDTO(Security security) {
@@ -28,12 +31,13 @@ public class SecurityResponseDTO {
         id = security.getId();
         secid = security.getSecid();
         name = security.getName();
-        currentPrice = security.getCurrentPrice();
+        totalCost = security.getTotalCost();
         profit = security.getProfit();
         type = security.getType();
         exchange = security.getExchange();
         security.getPurchaseInfos().forEach(purchaseInfo -> {
             purchaseInfos.add(new PurchaseInfoDTO(purchaseInfo));
         });
+        currency = security.getCurrency();
     }
 }
