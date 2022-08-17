@@ -17,7 +17,7 @@ public class SecurityController {
 
     @GetMapping("/portfolio/{id}")
     public List<SecurityResponseDTO> getSecurities(@PathVariable Long id) {
-        return securityService.getSecurities(id);
+        return securityService.getSecuritiesDTO(id);
     }
 
     @GetMapping("/{id}")
@@ -26,8 +26,8 @@ public class SecurityController {
     }
 
     @PostMapping
-    public void addSecurity(@RequestBody SecurityDTO security) {
-        securityService.saveSecurity(security);
+    public SecurityResponseDTO addSecurity(@RequestBody SecurityDTO security) {
+        return securityService.saveSecurity(security);
     }
 
     @DeleteMapping("/{id}")

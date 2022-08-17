@@ -12,6 +12,7 @@ import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.enumeration.external.moex.Engine;
 import ru.tink.practice.enumeration.external.moex.Market;
 import ru.tink.practice.enumeration.external.moex.SecurityDTOType;
+import ru.tink.practice.exception.SecurityNotFoundInExternalServiceException;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.math.BigDecimal;
@@ -128,7 +129,6 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);
     }
 
-    // solve nullPointerException case
     private Map<String, String> getSecurityDescription(String secid) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities")
@@ -139,16 +139,17 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("description.columns", "name,value")
                 .build().toUri();
 
-        SecurityDescriptionDTO[] test = restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class);
         List<Map<String, Object>> descriptions =
-                test[1].getDescriptions();
+                restTemplate.getForObject(destUrl, SecurityDescriptionDTO[].class)[1].getDescriptions();
+        if(descriptions.isEmpty()) {
+            throw new SecurityNotFoundInExternalServiceException(secid);
+        }
         Map<String, String> json = new HashMap<>();
         descriptions.forEach(map -> json
                 .put(map.get("name").toString().toLowerCase(), map.get("value").toString()));
         return json;
     }
 
-    // solve nullPointerException case
     private List<CurrentPriceDTO> getPrices(URI destUrl, String securityType) {
         CurrentPricesDTO currentPrices =
                 restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];

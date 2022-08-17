@@ -1,12 +1,7 @@
 package ru.tink.practice.exception;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class SecurityNotFoundException extends RuntimeException {
+public class SecurityNotFoundException extends EntityNotFoundException {
 
     public SecurityNotFoundException(Long id) {
-        super(String.format("Security with %s not found", id));
+        super(String.format("Security with id %s not found", id));
     }
 }

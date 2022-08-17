@@ -23,8 +23,9 @@ public class Portfolio {
     @OneToMany(mappedBy = "portfolio")
     private List<Security> securities;
 
-    public Portfolio(String name, BigDecimal profit) {
+    public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {
         this.name = name;
         this.profit = profit;
+        this.totalCost = totalCost;
     }
 }

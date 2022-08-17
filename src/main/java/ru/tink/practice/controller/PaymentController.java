@@ -11,7 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/payment")
 public class PaymentController {
-
     private final ExchangeIntegrationService exchangeIntegrationService;
 
     @GetMapping("exchange/{exchangeName}/security/{secid}")

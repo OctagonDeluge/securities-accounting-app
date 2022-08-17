@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.tink.practice.entity.Portfolio;
 import ru.tink.practice.entity.PurchaseInfo;
 import ru.tink.practice.entity.Security;
-import ru.tink.practice.repository.PortfolioRepository;
-import ru.tink.practice.repository.SecurityRepository;
+import ru.tink.practice.service.PortfolioService;
+import ru.tink.practice.service.SecurityService;
 import ru.tink.practice.service.integration.ExchangeIntegrationService;
 
 import javax.transaction.Transactional;
@@ -20,17 +20,17 @@ import java.util.List;
 public class ProfitCalculationService {
 
     private final ExchangeIntegrationService exchangeIntegrationService;
-    private final SecurityRepository securityRepository;
-    private final PortfolioRepository portfolioRepository;
+    private final SecurityService securityService;
+    private final PortfolioService portfolioService;
 
     @Transactional
     public void calculateProfit() {
-        List<Portfolio> portfolios = portfolioRepository.findAll();
+        List<Portfolio> portfolios = portfolioService.getAllPortfolios();
         for (Portfolio portfolio : portfolios) {
             BigDecimal portfolioProfit = BigDecimal.valueOf(0);
             BigDecimal portfolioPrice = BigDecimal.valueOf(0);
             List<Security> securities =
-                    securityRepository.findAllByPortfolioId(portfolio.getId());
+                    securityService.getSecurities(portfolio.getId());
             for (Security security : securities) {
                 BigDecimal securityProfit = BigDecimal.valueOf(0);
                 BigDecimal securityPrice = BigDecimal.valueOf(0);
@@ -40,7 +40,6 @@ public class ProfitCalculationService {
                                 security.getExchange().getName());
                 log.info(currentSecurityPrice.toString());
                 for(PurchaseInfo purchaseInfo: security.getPurchaseInfos()) {
-                    //BigDecimal
                     BigDecimal purchaseProfit
                             = (currentSecurityPrice.subtract(purchaseInfo.getPrice())).multiply(BigDecimal.valueOf(purchaseInfo.getQuantity()));
                     log.info(purchaseInfo.toString());
@@ -50,14 +49,14 @@ public class ProfitCalculationService {
                 security.setTotalCost(currentSecurityPrice);
                 security.setProfit(securityProfit);
                 log.info(security.getProfit().toString());
-                securityRepository.save(security);
+                securityService.saveSecurity(security);
                 portfolioPrice = portfolioPrice.add(securityPrice);
                 portfolioProfit = portfolioProfit.add(securityProfit);
             }
             portfolio.setTotalCost(portfolioPrice);
             portfolio.setProfit(portfolioProfit);
             log.info(portfolio.getProfit().toString());
-            portfolioRepository.save(portfolio);
+            portfolioService.savePortfolio(portfolio);
         }
     }
 }
