@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import axios from "axios";
 import {IconSearch} from "@tabler/icons";
 import {Autocomplete, ScrollArea, Table, Button} from "@mantine/core";
@@ -9,10 +9,6 @@ import "../assets/styles/ExchangeStyles.css"
 export function Exchange() {
     const [searchValue, setSearchValue] = useState('');
     const [securities, setSecurities] = useState([]);
-
-    useEffect(() => {
-
-    })
 
     const searchSecurity = () => {
         axios

@@ -15,7 +15,8 @@ export function PortfolioCard({portfolio, deletePortfolio, updatePortfolio}) {
         navigate(value);
     }
 
-    return (<tr key={portfolio.id}>
+    return (
+        <tr key={portfolio.id}>
             <td onClick={navigateToSecurityPage}>
                 <TextInput
                     value={name}
@@ -44,5 +45,6 @@ export function PortfolioCard({portfolio, deletePortfolio, updatePortfolio}) {
                     onClick={() => setDisabled(false)}/>}
             </td>
             <td><IconTrash className='interactiveIcon' onClick={() => deletePortfolio(portfolio.id)}/></td>
-        </tr>)
+        </tr>
+    );
 }

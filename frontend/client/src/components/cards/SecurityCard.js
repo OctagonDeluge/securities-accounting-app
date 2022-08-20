@@ -1,8 +1,5 @@
 import { createStyles, Group, Paper, Text } from '@mantine/core';
 import {
-    IconUserPlus,
-    IconDiscount2,
-    IconReceipt2,
     IconCoin,
     IconArrowUpRight,
     IconArrowDownRight,
@@ -35,16 +32,9 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-const icons = {
-    user: IconUserPlus,
-    discount: IconDiscount2,
-    receipt: IconReceipt2,
-    coin: IconCoin,
-};
 
 export function SecurityCard({security}) {
     const { classes } = useStyles();
-    const Icon = icons["coin"];
     const DiffIcon = security.profit > 0 ? IconArrowUpRight : IconArrowDownRight;
     const navigate = useNavigate();
     const {portfolioId} = useParams();
@@ -60,7 +50,7 @@ export function SecurityCard({security}) {
                     <Text size="xs" color="dimmed" className={classes.title}>
                         {security.name}
                     </Text>
-                    <Icon className={classes.icon} size={22} stroke={1.5} />
+                    <IconCoin className={classes.icon} size={22} stroke={1.5} />
                 </Group>
 
                 <Group align="flex-end" spacing="xs" mt={25}>
