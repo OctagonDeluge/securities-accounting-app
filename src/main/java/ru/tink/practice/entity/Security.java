@@ -1,17 +1,13 @@
 package ru.tink.practice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.tink.practice.dto.response.PurchaseInfoDTO;
-import ru.tink.practice.dto.response.SecurityResponseDTO;
+import lombok.*;
 import ru.tink.practice.enumeration.Currency;
 import ru.tink.practice.enumeration.Exchange;
 import ru.tink.practice.enumeration.SecurityType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,6 +35,6 @@ public class Security {
     @ManyToOne(fetch = FetchType.LAZY)
     private Portfolio portfolio;
 
-    @OneToMany(mappedBy = "security")
+    @OneToMany(mappedBy = "security", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseInfo> purchaseInfos;
 }

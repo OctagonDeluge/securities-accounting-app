@@ -22,7 +22,7 @@ public class PortfolioService {
         return portfolioRepository.save(new Portfolio(portfolioName, BigDecimal.valueOf(0), BigDecimal.valueOf(0)));
     }
 
-    public Portfolio updatePortfolio(Long id, String portfolioName) {
+    public Portfolio updatePortfolio(Long id, @NotBlank String portfolioName) {
         Portfolio portfolio = portfolioRepository.findById(id)
                 .orElseThrow(() -> new PortfolioNotFoundException(id));
         portfolio.setName(portfolioName);

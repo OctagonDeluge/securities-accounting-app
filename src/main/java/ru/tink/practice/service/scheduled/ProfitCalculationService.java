@@ -38,24 +38,20 @@ public class ProfitCalculationService {
                         .getCurrentSecurityPrice(security.getSecid(),
                                 security.getType().getName(),
                                 security.getExchange().getName());
-                log.info(currentSecurityPrice.toString());
-                for(PurchaseInfo purchaseInfo: security.getPurchaseInfos()) {
+                for (PurchaseInfo purchaseInfo : security.getPurchaseInfos()) {
                     BigDecimal purchaseProfit
                             = (currentSecurityPrice.subtract(purchaseInfo.getPrice())).multiply(BigDecimal.valueOf(purchaseInfo.getQuantity()));
-                    log.info(purchaseInfo.toString());
                     securityProfit = securityProfit.add(purchaseProfit);
                     securityPrice = securityPrice.add(purchaseInfo.getPrice().multiply(BigDecimal.valueOf(purchaseInfo.getQuantity())));
                 }
                 security.setTotalCost(currentSecurityPrice);
                 security.setProfit(securityProfit);
-                log.info(security.getProfit().toString());
                 securityService.saveSecurity(security);
                 portfolioPrice = portfolioPrice.add(securityPrice);
                 portfolioProfit = portfolioProfit.add(securityProfit);
             }
             portfolio.setTotalCost(portfolioPrice);
             portfolio.setProfit(portfolioProfit);
-            log.info(portfolio.getProfit().toString());
             portfolioService.savePortfolio(portfolio);
         }
     }

@@ -1,8 +1,7 @@
 package ru.tink.practice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ public class Portfolio {
     private BigDecimal profit;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "portfolio")
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;
 
     public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {

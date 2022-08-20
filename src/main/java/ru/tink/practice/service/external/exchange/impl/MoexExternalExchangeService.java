@@ -12,6 +12,7 @@ import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.enumeration.external.moex.Engine;
 import ru.tink.practice.enumeration.external.moex.Market;
 import ru.tink.practice.enumeration.external.moex.SecurityDTOType;
+import ru.tink.practice.exception.CandlesForSecurityNotFound;
 import ru.tink.practice.exception.SecurityNotFoundInExternalServiceException;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
@@ -85,7 +86,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("from", LocalDate.now().minusDays(3))
                 .queryParam("iss.json", "extended")
                 .queryParam("candles.columns", "close,end").build().toUri();
-        return getPrices(destUrl, securityType).get(0).getClose();
+        return getPrices(secid, destUrl, securityType).get(0).getClose();
     }
 
     @Override
@@ -122,7 +123,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .pathSegment("securities.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.json", "extended")
-                .queryParam("securities.columns", "secid,shortname,name,group")
+                .queryParam("securities.columns", "id,secid,shortname,name,group")
                 .queryParam("group_by_filter", securityType)
                 .queryParam("group_by", "group")
                 .queryParam("q", securityName).build().toUri();
@@ -150,9 +151,12 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return json;
     }
 
-    private List<CurrentPriceDTO> getPrices(URI destUrl, String securityType) {
+    private List<CurrentPriceDTO> getPrices(String secid, URI destUrl, String securityType) {
         CurrentPricesDTO currentPrices =
                 restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1];
+        if(currentPrices.getCurrentPrices().isEmpty()) {
+            throw new CandlesForSecurityNotFound(secid);
+        }
         if(Market.of(securityType).equals(SecurityType.BOND.getName())) {
             currentPrices.getCurrentPrices().forEach(CurrentPriceDTO::fixCloseForBond);
         }

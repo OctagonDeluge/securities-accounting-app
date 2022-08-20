@@ -1,0 +1,13 @@
+.security {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.securities {
+    display: flex;
+    width: 70%;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}

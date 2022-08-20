@@ -1,8 +1,7 @@
 package ru.tink.practice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.tink.practice.enumeration.Currency;
 
 import javax.persistence.*;

@@ -12,7 +12,6 @@ import ru.tink.practice.entity.Security;
 import ru.tink.practice.enumeration.Exchange;
 import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.exception.SecurityNotFoundException;
-import ru.tink.practice.repository.PurchaseInfoRepository;
 import ru.tink.practice.repository.SecurityRepository;
 
 import javax.validation.Valid;
@@ -28,12 +27,13 @@ public class SecurityService {
 
     private final SecurityRepository securityRepository;
     private final PortfolioService portfolioService;
-    private final PurchaseInfoRepository purchaseInfoRepository;
 
     public SecurityResponseDTO saveSecurity(@Valid SecurityDTO securityDTO) {
         Security security =
-                securityRepository.findBySecid(securityDTO.getSecid());
-        Portfolio portfolio = portfolioService.getPortfolioById(securityDTO.getPortfolioId());
+                securityRepository
+                        .findByPortfolioIdAndSecid(securityDTO.getPortfolioId(),securityDTO.getSecid());
+        Portfolio portfolio =
+                portfolioService.getPortfolioById(securityDTO.getPortfolioId());
         if (security == null) {
             security = new Security();
             security.setSecid(securityDTO.getSecid());
@@ -44,7 +44,7 @@ public class SecurityService {
             security.setType(SecurityType.of(securityDTO.getType()));
             security.setPortfolio(portfolio);
             security.setCurrency(securityDTO.getCurrency());
-            securityRepository.save(security);
+            security.setPurchaseInfos(new ArrayList<>());
         }
         PurchaseInfo purchaseInfo = new PurchaseInfo();
         purchaseInfo.setPurchaseDate(LocalDateTime.now());
@@ -59,9 +59,9 @@ public class SecurityService {
         portfolio.setTotalCost(portfolio.getTotalCost()
                 .add(totalCost));
 
+        security.getPurchaseInfos().add(purchaseInfo);
+        portfolio.getSecurities().add(security);
         portfolioService.savePortfolio(portfolio);
-        securityRepository.save(security);
-        purchaseInfoRepository.save(purchaseInfo);
         return new SecurityResponseDTO(security);
     }
 
@@ -70,9 +70,12 @@ public class SecurityService {
     }
 
     public void deleteSecurity(Long id) {
-        securityRepository.findById(id)
+        Security security = securityRepository.findById(id)
                 .orElseThrow(() -> new SecurityNotFoundException(id));
         securityRepository.deleteById(id);
+        Portfolio portfolio = security.getPortfolio();
+        portfolio.setTotalCost(portfolio.getTotalCost().subtract(security.getTotalCost()));
+        portfolioService.savePortfolio(portfolio);
     }
 
     public List<SecurityResponseDTO> getSecuritiesDTO(Long portfolioId) {

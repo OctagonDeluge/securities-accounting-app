@@ -14,7 +14,7 @@ public interface SecurityRepository extends JpaRepository<Security, Long> {
 
     List<Security> findAllByPortfolioId(Long portfolioId);
 
-    Security findBySecid(String secid);
+    Security findByPortfolioIdAndSecid(Long portfolioId, String secid);
 
     @Query(value = "select type, count(1) from " +
             "(select type from security where portfolio_id = ?1) as st\n" +

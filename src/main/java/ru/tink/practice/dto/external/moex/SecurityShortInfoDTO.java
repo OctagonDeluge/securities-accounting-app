@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SecurityShortInfoDTO {
+    private Long id;
     private String secid;
     private String shortname;
     private String group;
