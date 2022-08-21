@@ -12,7 +12,7 @@ public class SchedulersComponent {
 
     private final ProfitCalculationService profitCalculationService;
 
-    @Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "0 0/10 * * * *")
     public void calculateProfit() {
         log.info("profit calculation");
         profitCalculationService.calculateProfit();

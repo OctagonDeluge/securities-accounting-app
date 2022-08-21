@@ -8,6 +8,7 @@ import "../assets/styles/PortfolioSecurityInfoStyles.css"
 import {PurchaseInfoCard} from "../components/cards/PurchaseInfoCard";
 import {IconCircleCheck, IconSquareX} from "@tabler/icons";
 import {showNotification} from "@mantine/notifications";
+import {PaymentCard} from "../components/cards/PaymentCard";
 
 export function PortfolioSecurityInfo() {
     const {securityId} = useParams();
@@ -23,25 +24,27 @@ export function PortfolioSecurityInfo() {
         purchaseInfos: []
     });
     const [purchaseInfos, setPurchaseInfos] = useState([]);
+    const [payments, setPayments] = useState([]);
     const [deleted, setDeleted] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         loadSecurity();
-    }, [])
+    }, []);
 
     useEffect(() => {
         if(deleted) {
             navigate(-1);
         }
-    }, [deleted])
+    }, [deleted]);
 
     const loadSecurity = () => {
         axios
             .get(`${API_URL}/security/${securityId}`)
-            .then(res => {
-                setSecurity(res.data);
-                loadPurchaseInfos(res.data)
+            .then(response => {
+                setSecurity(response.data);
+                loadPurchaseInfos(response.data);
+                loadPayments(response.data.exchangeName, response.data.secid);
             })
     }
 
@@ -54,9 +57,17 @@ export function PortfolioSecurityInfo() {
                     purchaseIds: ids.toString()
                 }
             })
-            .then(res => {
-                setPurchaseInfos(res.data);
-            })
+            .then(response => {
+                setPurchaseInfos(response.data);
+            });
+    }
+
+    const loadPayments = (exchangeName, secid) => {
+        axios
+            .get(`${API_URL}/payment/exchange/${exchangeName}/security/${secid}`)
+            .then(response => {
+                setPayments(response.data);
+            });
     }
 
     const deleteSecurity = (id) => {
@@ -92,6 +103,7 @@ export function PortfolioSecurityInfo() {
                     <Text size='xl' color="red">-{security.profit}</Text>}
             </div>
             <SecurityPriceChart entity={security}/>
+            <Title order={4}>История</Title>
             <ScrollArea>
                 <Table highlightOnHover={true} sx={{minWidth: 800}} verticalSpacing="xs">
                     <thead>
@@ -105,6 +117,24 @@ export function PortfolioSecurityInfo() {
                     {
                         purchaseInfos.map(purchase => (
                             <PurchaseInfoCard key={purchase.id} purchase={purchase}/>
+                        ))
+                    }
+                    </tbody>
+                </Table>
+            </ScrollArea>
+            {security.group === "shares" ? <Title order={4}>Дивиденды</Title> : <Title order={4}>Купоны</Title>}
+            <ScrollArea>
+                <Table highlightOnHover={true} sx={{minWidth: 800}} verticalSpacing="xs">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        payments.map(payment => (
+                            <PaymentCard key={payment.paymentDate} payment={payment}/>
                         ))
                     }
                     </tbody>
