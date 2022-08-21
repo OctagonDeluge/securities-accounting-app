@@ -9,6 +9,7 @@ import React from "react";
 import {links} from "./constants/HeaderLinks";
 import {PortfolioSecurityInfo} from "./pages/PortfolioSecurityInfo";
 import {Statistics} from "./pages/Statistics";
+import {NotFound} from "./pages/NotFound";
 
 export function App() {
     return (
@@ -21,6 +22,7 @@ export function App() {
                 <Route path="/portfolio/:portfolioId/statistics" element={<Statistics/>} />
                 <Route path="/portfolio/:portfolioId/security/:securityId" element={<PortfolioSecurityInfo/>} />
                 <Route path="/portfolio/:portfolioId/exchange/:exchange/security/:secid" element={<ExchangeSecurityInfo/>} />
+                <Route path="*" element={<NotFound/>} />
             </Routes>
         </div>
     );

@@ -6,7 +6,7 @@ import {TextInput, ScrollArea, Table} from "@mantine/core";
 import {showNotification} from "@mantine/notifications";
 import {API_URL} from "../constants/API";
 import {PortfolioCard} from "../components/cards/PortfolioCard";
-import {IconCirclePlus, IconBriefcase} from "@tabler/icons"
+import {IconCirclePlus, IconBriefcase, IconCircleCheck} from "@tabler/icons"
 
 export function Portfolio() {
     const [portfolios, setPortfolios] = useState([]);
@@ -19,9 +19,16 @@ export function Portfolio() {
     const deletePortfolio = (id) => {
         axios
             .delete(`${API_URL}/portfolio/${id}`)
-            .then(res => {
+            .then(response => {
                 let clone = [...portfolios].filter(item => item.id !== id);
                 setPortfolios(clone);
+                showNotification({
+                    autoClose: 5000,
+                    title: "Успех",
+                    message: 'Портфель удален',
+                    color: 'green',
+                    icon: <IconCircleCheck/>,
+                })
             })
     }
 
@@ -32,15 +39,15 @@ export function Portfolio() {
                     portfolioName: newName
                 }
             })
-            .then(res => {
+            .then(response => {
                 let clone = [...portfolios].filter(item => item.id !== id);
-                clone.push(res.data);
+                clone.push(response.data);
                 setPortfolios(clone);
             })
-            .catch(res => {
+            .catch(response => {
                 setName(oldName);
                 let text = "";
-                res.response.data.map(resp => text += resp.fieldName + " " + resp.message);
+                response.response.data.map(resp => text += resp.fieldName + " " + resp.message);
                 showNotification({
                     title: "Не удалось обновить портфель",
                     message: text,
