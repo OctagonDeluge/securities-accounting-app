@@ -126,6 +126,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("securities.columns", "id,secid,shortname,name,group")
                 .queryParam("group_by_filter", securityType)
                 .queryParam("group_by", "group")
+                .queryParam("limit", 20)
                 .queryParam("q", securityName).build().toUri();
         return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);
     }
