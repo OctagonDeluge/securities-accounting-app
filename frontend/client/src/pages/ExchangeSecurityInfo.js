@@ -43,7 +43,6 @@ export function ExchangeSecurityInfo() {
             currency: security.currency,
             portfolioId: Number(portfolioId)
         }
-        console.log(securityDTO);
         axios
             .post(`${API_URL}/security`, securityDTO)
             .then(response => {
@@ -79,7 +78,7 @@ export function ExchangeSecurityInfo() {
                     description="Минимальное количество - 1"
                     min={1}
                 />
-                <Button component="button" onClick={() => addSecurity(number, portfolioId)}>Добавить</Button>
+                <Button component="button" onClick={() => {addSecurity(number, portfolioId); setOpened(false)}}>Добавить</Button>
             </Modal>
         </div>
     )
