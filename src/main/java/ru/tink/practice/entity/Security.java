@@ -31,10 +31,12 @@ public class Security {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
+    @ToString.Exclude
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Portfolio portfolio;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "security", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseInfo> purchaseInfos;
 }

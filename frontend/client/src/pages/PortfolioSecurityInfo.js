@@ -98,9 +98,9 @@ export function PortfolioSecurityInfo() {
                 <Text size='xl'>{security.totalCost} {security.currency}</Text>
                 <Text size='lg'>Доход от текущей стоимости</Text>
                 {security.profit >= 0 ?
-                    <Text size='xl' color="#008000">+{security.profit}</Text>
+                    <Text size='xl' color="#008000">+{security.profit} {security.currency}</Text>
                     :
-                    <Text size='xl' color="red">-{security.profit}</Text>}
+                    <Text size='xl' color="red">-{security.profit} {security.currency}</Text>}
             </div>
             <SecurityPriceChart entity={security}/>
             <Title order={4}>История</Title>

@@ -41,10 +41,12 @@ public class ProfitCalculationService {
                 for (PurchaseInfo purchaseInfo : security.getPurchaseInfos()) {
                     BigDecimal purchaseProfit
                             = (currentSecurityPrice.subtract(purchaseInfo.getPrice())).multiply(BigDecimal.valueOf(purchaseInfo.getQuantity()));
+                    log.info(purchaseProfit.toString());
                     securityProfit = securityProfit.add(purchaseProfit);
                     securityPrice = securityPrice.add(purchaseInfo.getPrice().multiply(BigDecimal.valueOf(purchaseInfo.getQuantity())));
+                    securityPrice = securityPrice.add(purchaseProfit);
                 }
-                security.setTotalCost(currentSecurityPrice);
+                security.setTotalCost(securityPrice);
                 security.setProfit(securityProfit);
                 securityService.saveSecurity(security);
                 portfolioPrice = portfolioPrice.add(securityPrice);

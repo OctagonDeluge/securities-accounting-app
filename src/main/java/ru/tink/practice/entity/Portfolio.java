@@ -18,6 +18,7 @@ public class Portfolio {
     private BigDecimal totalCost;
     private BigDecimal profit;
 
+    @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;

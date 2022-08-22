@@ -23,6 +23,7 @@ public class PurchaseInfo {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
+    @ToString.Exclude
     @JsonIgnore
     @ManyToOne
     private Security security;
