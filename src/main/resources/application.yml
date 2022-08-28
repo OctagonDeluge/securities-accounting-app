@@ -12,6 +12,6 @@ spring:
 
 issmoex:
   api:
-    url: http://iss.moex.com/iss
+    url: https://iss.moex.com/iss
     serviceName: moex
 
