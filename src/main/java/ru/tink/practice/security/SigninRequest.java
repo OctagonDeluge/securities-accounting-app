@@ -1,4 +1,4 @@
-package ru.tink.practice.dto.security;
+package ru.tink.practice.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

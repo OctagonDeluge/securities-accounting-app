@@ -4,10 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,10 +18,18 @@ public class User {
     private String email;
     private String password;
     private String name;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    private Boolean enabled;
 
-    public User(String email, String password, String name) {
+    @OneToMany(mappedBy = "user")
+    private List<Portfolio> portfolios;
+
+
+    public User(String email, String password, String name, Boolean enabled) {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.enabled = enabled;
     }
 }

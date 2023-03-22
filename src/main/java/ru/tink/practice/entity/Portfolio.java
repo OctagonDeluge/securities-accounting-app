@@ -22,6 +22,8 @@ public class Portfolio {
     @JsonIgnore
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;
+    @ManyToOne
+    private User user;
 
     public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {
         this.name = name;
