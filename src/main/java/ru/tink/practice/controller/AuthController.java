@@ -7,18 +7,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.tink.practice.security.SigninRequest;
 import ru.tink.practice.security.SignupRequest;
-import ru.tink.practice.service.UserService;
+import ru.tink.practice.security.SecurityUserService;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final SecurityUserService securityUserService;
 
     @PostMapping("/signup")
     public String signupUser(@RequestBody SignupRequest signupRequest) {
-        return userService.save(signupRequest);
+        return securityUserService.save(signupRequest);
     }
 
     @PostMapping("/signin")

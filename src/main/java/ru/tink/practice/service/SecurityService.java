@@ -13,6 +13,7 @@ import ru.tink.practice.enumeration.Exchange;
 import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.exception.SecurityNotFoundException;
 import ru.tink.practice.repository.SecurityRepository;
+import ru.tink.practice.service.PortfolioService;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -70,6 +71,7 @@ public class SecurityService {
     }
 
     public void deleteSecurity(Long id) {
+        //findByUsernameAndId
         Security security = securityRepository.findById(id)
                 .orElseThrow(() -> new SecurityNotFoundException(id));
         securityRepository.deleteById(id);

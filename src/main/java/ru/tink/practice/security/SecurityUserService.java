@@ -1,18 +1,16 @@
-package ru.tink.practice.service;
+package ru.tink.practice.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.tink.practice.security.SecurityUser;
-import ru.tink.practice.security.SignupRequest;
 import ru.tink.practice.entity.User;
 import ru.tink.practice.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class SecurityUserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     public String save(SignupRequest signupRequest) {
