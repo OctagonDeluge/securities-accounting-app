@@ -23,7 +23,7 @@ public class Portfolio {
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;
     @ManyToOne
-    private User user;
+    private User client;
 
     public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {
         this.name = name;

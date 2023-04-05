@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "client")
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -22,14 +23,15 @@ public class User {
     private Role role;
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "client")
     private List<Portfolio> portfolios;
 
 
-    public User(String email, String password, String name, Boolean enabled) {
+    public User(String email, String password, String name, Role role, Boolean enabled) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.enabled = enabled;
+        this.role = role;
     }
 }

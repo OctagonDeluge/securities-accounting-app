@@ -13,13 +13,6 @@ import ru.tink.practice.repository.UserRepository;
 public class SecurityUserService implements UserDetailsService {
     private final UserRepository userRepository;
 
-    public String save(SignupRequest signupRequest) {
-        //email validation
-        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getName(), true);
-        userRepository.save(user);
-        return "registrated";
-    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("not found"));

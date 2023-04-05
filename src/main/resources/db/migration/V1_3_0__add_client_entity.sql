@@ -1,4 +1,4 @@
-create table "user" (
+create table client (
     id bigserial primary key,
     email varchar(50),
     password varchar(255),
@@ -6,5 +6,5 @@ create table "user" (
 );
 
 alter table portfolio
-    add column user_id bigint references "user"(id);
+    add column client_id bigint references client(id);
 

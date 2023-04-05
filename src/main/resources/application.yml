@@ -3,9 +3,16 @@ spring:
     url: jdbc:postgresql://localhost:5444/investment_assets
     username: postgres
     password: postgres
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: investments
 
   flyway:
     enabled: true
+    init-sqls: CREATE SCHEMA IF NOT EXISTS investments
+    default-schema: investments
   jackson:
     deserialization:
       FAIL_ON_UNKNOWN_PROPERTIES: false
