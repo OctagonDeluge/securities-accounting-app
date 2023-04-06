@@ -16,13 +16,13 @@ import java.util.Collections;
 @Setter
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
-
     private Long id;
     private String email;
     private String password;
     private String name;
     private Role role;
     private Boolean enabled;
+    private Boolean authenticated;
 
     public SecurityUser(User user) {
         this.id = user.getId();
@@ -31,6 +31,7 @@ public class SecurityUser implements UserDetails {
         this.name = user.getName();
         this.role = user.getRole();
         this.enabled = user.getEnabled();
+        this.authenticated = user.getAuthenticated();
     }
 
     @Override

@@ -3,48 +3,33 @@ package ru.tink.practice.security.jwt;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 import ru.tink.practice.security.SecurityUser;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Component
 @Slf4j
 public class JwtUtils {
-
     @Value("${jwt.secretkey}")
     private String jwtSecret;
 
     @Value("${jwt.exprdays}")
     private Integer jwtExpirationDays;
 
-    @Value("${jwt.cookie}")
-    private String jwtCookie;
 
-    public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null) {
-            System.out.println(cookie.getValue());
-            return cookie.getValue();
-        } else {
-            return null;
-        }
+    public String getJwtFromHeader(HttpServletRequest request) {
+        return request.getHeader(HttpHeaders.AUTHORIZATION);
     }
 
-    public ResponseCookie generateJwtCookie(SecurityUser userPrincipal) {
-        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        log.info(jwt);
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
-        return cookie;
+    public String generateJwt(SecurityUser userPrincipal) {
+        return generateTokenFromUsername(userPrincipal.getUsername());
     }
 
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, "").path("/api").build();
-        return cookie;
+    public String getCleanJwtCookie() {
+        return null;
     }
 
     public String getUsernameFromJwtToken(String token) {

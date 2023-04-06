@@ -28,7 +28,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            log.info("filter");
             String jwt = parseJwt(request);
             log.info(jwt);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
@@ -36,14 +35,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 System.out.println(username);
                 UserDetails userDetails = securityUserService.loadUserByUsername(username);
                 log.info("authorization");
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                null,
-                                userDetails.getAuthorities());
+                log.info(((SecurityUser) userDetails).getAuthenticated().toString());
+                if(((SecurityUser) userDetails).getAuthenticated()) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                log.info(((SecurityUser) authentication.getPrincipal()).getName());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    log.info(((SecurityUser) authentication.getPrincipal()).getName());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
@@ -53,6 +55,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        return jwtUtils.getJwtFromCookies(request);
+        return jwtUtils.getJwtFromHeader(request);
     }
 }

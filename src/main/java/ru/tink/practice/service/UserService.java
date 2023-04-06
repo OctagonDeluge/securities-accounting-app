@@ -16,6 +16,8 @@ import ru.tink.practice.security.SignupRequest;
 public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
+    private final boolean AUTHENTICATED = true;
+    private final boolean NOT_AUTHENTICATED = false;
     public ResponseEntity<String> save(SignupRequest signupRequest) {
         //email validation
         if(userRepository.findByEmail(signupRequest.getEmail()).isEmpty()) {
@@ -30,5 +32,13 @@ public class UserService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "User with such email already exists");
         }
+    }
+
+    public void signinUser(String email) {
+        userRepository.updateAuthByEmail(AUTHENTICATED, email);
+    }
+
+    public void signoutUser(String email) {
+        userRepository.updateAuthByEmail(NOT_AUTHENTICATED, email);
     }
 }

@@ -22,6 +22,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
     private Boolean enabled;
+    private Boolean authenticated;
 
     @OneToMany(mappedBy = "client")
     private List<Portfolio> portfolios;
@@ -33,5 +34,6 @@ public class User {
         this.name = name;
         this.enabled = enabled;
         this.role = role;
+        this.authenticated = false;
     }
 }
