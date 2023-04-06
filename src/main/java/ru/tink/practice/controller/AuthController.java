@@ -1,6 +1,7 @@
 package ru.tink.practice.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import ru.tink.practice.service.UserService;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
@@ -34,9 +36,11 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<UserDTO> signinUser(@RequestBody SigninRequest signinRequest) {
+        log.info("signing");
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info(((SecurityUser) authentication.getPrincipal()).getName());
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 

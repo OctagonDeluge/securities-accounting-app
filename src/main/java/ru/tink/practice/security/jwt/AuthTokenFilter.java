@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.tink.practice.security.SecurityUser;
 import ru.tink.practice.security.SecurityUserService;
 
 import javax.servlet.FilterChain;
@@ -27,19 +28,21 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
+            log.info("filter");
             String jwt = parseJwt(request);
+            log.info(jwt);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUsernameFromJwtToken(jwt);
                 System.out.println(username);
                 UserDetails userDetails = securityUserService.loadUserByUsername(username);
-
+                log.info("authorization");
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
                                 userDetails.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+                log.info(((SecurityUser) authentication.getPrincipal()).getName());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
