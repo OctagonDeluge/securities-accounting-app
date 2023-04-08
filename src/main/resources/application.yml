@@ -26,3 +26,5 @@ issmoex:
     url: https://iss.moex.com/iss
     serviceName: moex
 
+client:
+  url: http://localhost:3000
