@@ -18,13 +18,16 @@ spring:
       FAIL_ON_UNKNOWN_PROPERTIES: false
 
 jwt:
-  secretkey: b723a296891aaca9cb691a5c9c74f6ad8e1f29883547276bd9b7e72ca42faef63de1a4b7c5f1b5fee5ce4b9cdedbb54f8027f599a76dfb9f08f175f2309cc56f
-  exprdays: 90
+  secret-key: b723a296891aaca9cb691a5c9c74f6ad8e1f29883547276bd9b7e72ca42faef63de1a4b7c5f1b5fee5ce4b9cdedbb54f8027f599a76dfb9f08f175f2309cc56f
+  expirationMinutes: 15
+refreshToken:
+  expirationDays: 30
 
-issmoex:
-  api:
-    url: https://iss.moex.com/iss
-    serviceName: moex
+external-api:
+  issmoex:
+    api:
+      url: https://iss.moex.com/iss
+      serviceName: moex
 
 client:
   url: http://localhost:3000

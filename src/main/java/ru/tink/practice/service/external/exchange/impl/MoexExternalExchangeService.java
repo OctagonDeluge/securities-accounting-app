@@ -29,10 +29,10 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${issmoex.api.url}")
+    @Value("${external-api.issmoex.api.url}")
     private String url;
 
-    @Value("${issmoex.api.serviceName}")
+    @Value("${external-api.issmoex.api.serviceName}")
     private String serviceName;
 
     private final String SECURITY_TYPE_KEY = "securityType";

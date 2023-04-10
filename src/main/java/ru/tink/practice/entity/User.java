@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "client")
 public class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     private String password;
@@ -23,10 +23,10 @@ public class User {
     private Role role;
     private Boolean enabled;
     private Boolean authenticated;
-
     @OneToMany(mappedBy = "client")
     private List<Portfolio> portfolios;
-
+    @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
+    private RefreshToken refreshToken;
 
     public User(String email, String password, String name, Role role, Boolean enabled) {
         this.email = email;

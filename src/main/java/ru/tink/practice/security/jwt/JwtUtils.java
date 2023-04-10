@@ -13,12 +13,13 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtUtils {
-    @Value("${jwt.secretkey}")
+
+    private final String TOKEN_TYPE = "Bearer ";
+
+    @Value("${jwt.secret-key}")
     private String jwtSecret;
-
-    @Value("${jwt.exprdays}")
-    private Integer jwtExpirationDays;
-
+    @Value("${jwt.expirationMinutes}")
+    private int jwtExpirationMs;
 
     public String getJwtFromHeader(HttpServletRequest request) {
         return request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -29,7 +30,7 @@ public class JwtUtils {
     }
 
     public String getCleanJwtCookie() {
-        return null;
+        return TOKEN_TYPE;
     }
 
     public String getUsernameFromJwtToken(String token) {
@@ -56,15 +57,15 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
-        return Jwts.builder()
+        return TOKEN_TYPE + Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(calculateExpirationDate(jwtExpirationDays)))
+                .setExpiration(new Date(calculateExpirationDate(jwtExpirationMs)))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    private long calculateExpirationDate(int days) {
-        return new Date().getTime() + (long) days*60*60*1000;
+    private long calculateExpirationDate(int minutes) {
+        return new Date().getTime() + (long) minutes*60*1000;
     }
 }
