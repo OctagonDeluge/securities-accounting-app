@@ -15,6 +15,6 @@ public class SchedulersComponent {
     @Scheduled(cron = "0 0/10 * * * *")
     public void calculateProfit() {
         log.info("profit calculation");
-        profitCalculationService.calculateProfit();
+        //profitCalculationService.calculateProfit();
     }
 }

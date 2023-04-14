@@ -35,8 +35,12 @@ public class Security {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Portfolio portfolio;
-
+    
     @ToString.Exclude
+    @JsonIgnore
     @OneToMany(mappedBy = "security", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseInfo> purchaseInfos;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User client;
 }

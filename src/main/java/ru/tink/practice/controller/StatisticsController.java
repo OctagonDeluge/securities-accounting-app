@@ -1,9 +1,11 @@
 package ru.tink.practice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.tink.practice.dto.response.StatisticDTO;
 import ru.tink.practice.dto.external.moex.CurrentPriceDTO;
+import ru.tink.practice.security.SecurityUser;
 import ru.tink.practice.service.SecurityService;
 import ru.tink.practice.service.integration.ExchangeIntegrationService;
 
@@ -26,7 +28,8 @@ public class StatisticsController {
     }
 
     @GetMapping("portfolio/{portfolioId}")
-    public List<StatisticDTO> getCount(@PathVariable Long portfolioId) {
-        return securityService.getNumberOfSecuritiesOfEachType(portfolioId);
+    public List<StatisticDTO> getCount(Authentication authentication, @PathVariable Long portfolioId) {
+        return securityService
+                .getNumberOfSecuritiesOfEachType((SecurityUser) authentication.getPrincipal(),portfolioId);
     }
 }

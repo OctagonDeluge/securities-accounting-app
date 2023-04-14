@@ -27,6 +27,10 @@ public class User {
     private List<Portfolio> portfolios;
     @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)
     private RefreshToken refreshToken;
+    @OneToMany(mappedBy = "client")
+    private List<Security> securities;
+    @OneToMany(mappedBy = "client")
+    private List<PurchaseInfo> purchaseInfos;
 
     public User(String email, String password, String name, Role role, Boolean enabled) {
         this.email = email;

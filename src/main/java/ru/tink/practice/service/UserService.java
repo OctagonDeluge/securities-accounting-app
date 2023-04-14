@@ -3,6 +3,7 @@ package ru.tink.practice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,6 +33,12 @@ public class UserService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "User with such email already exists");
         }
+    }
+
+    public User findUserByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public void signinUser(String email) {

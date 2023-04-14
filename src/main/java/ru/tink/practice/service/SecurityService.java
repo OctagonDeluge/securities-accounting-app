@@ -13,7 +13,9 @@ import ru.tink.practice.enumeration.Exchange;
 import ru.tink.practice.enumeration.SecurityType;
 import ru.tink.practice.exception.SecurityNotFoundException;
 import ru.tink.practice.repository.SecurityRepository;
+import ru.tink.practice.security.SecurityUser;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,13 +30,13 @@ public class SecurityService {
     private final SecurityRepository securityRepository;
     private final PortfolioService portfolioService;
 
-    //transactional
-    public SecurityResponseDTO saveSecurity(@Valid SecurityDTO securityDTO) {
+    @Transactional
+    public SecurityResponseDTO saveSecurity(SecurityUser securityUser, @Valid SecurityDTO securityDTO) {
         Security security =
                 securityRepository
                         .findByPortfolioIdAndSecid(securityDTO.getPortfolioId(),securityDTO.getSecid());
         Portfolio portfolio =
-                portfolioService.getPortfolioById(securityDTO.getPortfolioId());
+                portfolioService.getPortfolioById(securityUser, securityDTO.getPortfolioId());
         if (security == null) {
             security = new Security();
             security.setSecid(securityDTO.getSecid());
@@ -70,9 +72,11 @@ public class SecurityService {
         securityRepository.save(security);
     }
 
-    public void deleteSecurity(Long id) {
+    @Transactional
+    public void deleteSecurity(SecurityUser securityUser, Long id) {
         //findByUsernameAndId
-        Security security = securityRepository.findById(id)
+        Security security = securityRepository
+                .findByIdAndClientId(id, securityUser.getId())
                 .orElseThrow(() -> new SecurityNotFoundException(id));
         securityRepository.deleteById(id);
         Portfolio portfolio = security.getPortfolio();
@@ -80,23 +84,26 @@ public class SecurityService {
         portfolioService.savePortfolio(portfolio);
     }
 
-    public List<SecurityResponseDTO> getSecuritiesDTO(Long portfolioId) {
+    public List<SecurityResponseDTO> getSecuritiesDTO(SecurityUser securityUser, Long portfolioId) {
         List<SecurityResponseDTO> securities = new ArrayList<>();
-        securityRepository.findAllByPortfolioId(portfolioId)
+        securityRepository
+                .findAllByPortfolioIdAndClientId(portfolioId, securityUser.getId())
                 .forEach(security -> securities.add(new SecurityResponseDTO(security)));
         return securities;
     }
 
-    public List<Security> getSecurities(Long portfolioId) {
-        return securityRepository.findAllByPortfolioId(portfolioId);
+    public List<Security> getSecurities(SecurityUser securityUser, Long portfolioId) {
+        return securityRepository
+                .findAllByPortfolioIdAndClientId(portfolioId, securityUser.getId());
     }
 
-    public List<StatisticDTO> getNumberOfSecuritiesOfEachType(Long portfolioId) {
-        return securityRepository.countBySecurityType(portfolioId);
+    public List<StatisticDTO> getNumberOfSecuritiesOfEachType(SecurityUser securityUser, Long portfolioId) {
+        return securityRepository.countBySecurityType(portfolioId, securityUser.getId());
     }
 
-    public SecurityResponseDTO getSecurity(Long id) {
-        return new SecurityResponseDTO(securityRepository.findById(id)
+    @Transactional
+    public SecurityResponseDTO getSecurity(SecurityUser securityUser, Long id) {
+        return new SecurityResponseDTO(securityRepository.findByIdAndClientId(id, securityUser.getId())
                 .orElseThrow(() -> new SecurityNotFoundException(id)));
     }
 }

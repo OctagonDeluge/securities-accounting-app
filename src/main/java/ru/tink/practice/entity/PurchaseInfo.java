@@ -27,4 +27,8 @@ public class PurchaseInfo {
     @JsonIgnore
     @ManyToOne
     private Security security;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User client;
 }

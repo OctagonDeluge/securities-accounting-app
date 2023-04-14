@@ -23,7 +23,7 @@ public class ProfitCalculationService {
     private final SecurityService securityService;
     private final PortfolioService portfolioService;
 
-    @Transactional
+    /*@Transactional
     public void calculateProfit() {
         List<Portfolio> portfolios = portfolioService.getAllPortfolios();
         for (Portfolio portfolio : portfolios) {
@@ -56,5 +56,5 @@ public class ProfitCalculationService {
             portfolio.setProfit(portfolioProfit);
             portfolioService.savePortfolio(portfolio);
         }
-    }
+    }*/
 }

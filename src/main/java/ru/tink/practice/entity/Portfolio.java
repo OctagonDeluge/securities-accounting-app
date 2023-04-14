@@ -22,12 +22,14 @@ public class Portfolio {
     @JsonIgnore
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private User client;
 
-    public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {
+    public Portfolio(String name, BigDecimal totalCost, BigDecimal profit, User user) {
         this.name = name;
         this.profit = profit;
         this.totalCost = totalCost;
+        this.client = user;
     }
 }

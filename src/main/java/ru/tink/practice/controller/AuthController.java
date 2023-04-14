@@ -44,7 +44,7 @@ public class AuthController {
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
         userService.signinUser(userDetails.getEmail());
         String jwt = jwtUtils.generateJwt(userDetails);
-        RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).get();
+        RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
         if(refreshToken == null) {
            refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
         }
