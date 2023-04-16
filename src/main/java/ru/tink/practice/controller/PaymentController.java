@@ -11,10 +11,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/payment")
 public class PaymentController {
+
     private final ExchangeIntegrationService exchangeIntegrationService;
 
     @GetMapping("exchange/{exchangeName}/security/{secid}")
-    public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid, @PathVariable String exchangeName) {
-        return exchangeIntegrationService.getPaymentsBySecid(secid, exchangeName);
+    public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid,
+                                                   @PathVariable String exchangeName,
+                                                   @RequestParam Integer page) {
+        return exchangeIntegrationService.getPaymentsBySecid(exchangeName, secid, page);
     }
 }

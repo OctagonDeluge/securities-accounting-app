@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface ExternalExchangeService {
-    List<SecurityShortInfoDTO> getSecuritiesByName(String securityName);
+    List<SecurityShortInfoDTO> getSecuritiesByName(Integer page, String securityName);
 
-    List<PaymentDTO> getPaymentsBySecid(String secid);
+    List<PaymentDTO> getPaymentsBySecid(String secid, Integer page);
 
     SecurityFullInfoDTO getSecurityBySecid(String secid);
 

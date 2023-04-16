@@ -17,6 +17,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ExchangeIntegrationService {
+
     private final ApplicationContext context;
 
     /*public List<SecurityShortInfoDTO> loadSecuritiesByName(String securityName) {
@@ -25,16 +26,16 @@ public class ExchangeIntegrationService {
         return securities;
     }*/
 
-    public List<SecurityShortInfoDTO> loadSecuritiesByExchange(String securityName, String exchangeName) {
-        return determineExchange(exchangeName).getSecuritiesByName(securityName);
+    public List<SecurityShortInfoDTO> loadSecuritiesByExchange(String exchangeName, Integer page, String securityName) {
+        return determineExchange(exchangeName).getSecuritiesByName(page, securityName);
     }
 
     public SecurityFullInfoDTO getSecurityBySecid(String secid, String exchangeName) {
         return determineExchange(exchangeName).getSecurityBySecid(secid);
     }
 
-    public List<PaymentDTO> getPaymentsBySecid(String secid, String exchangeName) {
-        return determineExchange(exchangeName).getPaymentsBySecid(secid);
+    public List<PaymentDTO> getPaymentsBySecid(String exchangeName, String secid, Integer page) {
+        return determineExchange(exchangeName).getPaymentsBySecid(secid, page);
     }
 
     public BigDecimal getCurrentSecurityPrice(String secid, String securityType, String exchangeName) {
