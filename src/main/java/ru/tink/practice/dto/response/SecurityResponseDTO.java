@@ -7,8 +7,6 @@ import ru.tink.practice.entity.Security;
 import ru.tink.practice.enumeration.Currency;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,10 +20,8 @@ public class SecurityResponseDTO {
     private String group;
     private String exchangeName;
     private Currency currency;
-    private List<PurchaseInfoDTO> purchaseInfos;
 
     public SecurityResponseDTO(Security security) {
-        purchaseInfos = new ArrayList<>();
         id = security.getId();
         secid = security.getSecid();
         name = security.getName();
@@ -33,8 +29,6 @@ public class SecurityResponseDTO {
         profit = security.getProfit();
         group = security.getType().getName();
         exchangeName = security.getExchange().getName();
-        security.getPurchaseInfos().forEach(purchaseInfo ->
-                purchaseInfos.add(new PurchaseInfoDTO(purchaseInfo)));
         currency = security.getCurrency();
     }
 }

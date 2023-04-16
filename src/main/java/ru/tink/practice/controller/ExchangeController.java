@@ -15,13 +15,18 @@ public class ExchangeController {
 
     private final ExchangeIntegrationService exchangeIntegrationService;
 
-    @GetMapping("/{securityName}")
+    /*@GetMapping("/{securityName}")
     public List<SecurityShortInfoDTO> getSecuritiesByName(@PathVariable String securityName) {
-        return exchangeIntegrationService.loadSecurities(securityName);
-    }
+        return exchangeIntegrationService.loadSecuritiesByName(securityName);
+    }*/
 
     @GetMapping("{exchangeName}/security/{secid}")
     public SecurityFullInfoDTO getSecurityBySecid(@PathVariable String exchangeName, @PathVariable String secid) {
         return exchangeIntegrationService.getSecurityBySecid(secid, exchangeName);
+    }
+
+    @GetMapping("{exchangeName}/security")
+    public List<SecurityShortInfoDTO> getSecuritiesByExchange(@PathVariable String exchangeName, @RequestParam String securityName) {
+        return exchangeIntegrationService.loadSecuritiesByExchange(securityName, exchangeName);
     }
 }

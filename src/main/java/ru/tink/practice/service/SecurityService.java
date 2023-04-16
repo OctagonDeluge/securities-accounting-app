@@ -1,6 +1,7 @@
 package ru.tink.practice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.tink.practice.dto.SecurityDTO;
@@ -68,13 +69,8 @@ public class SecurityService {
         return new SecurityResponseDTO(security);
     }
 
-    public void saveSecurity(Security security) {
-        securityRepository.save(security);
-    }
-
     @Transactional
     public void deleteSecurity(SecurityUser securityUser, Long id) {
-        //findByUsernameAndId
         Security security = securityRepository
                 .findByIdAndClientId(id, securityUser.getId())
                 .orElseThrow(() -> new SecurityNotFoundException(id));
@@ -84,17 +80,12 @@ public class SecurityService {
         portfolioService.savePortfolio(portfolio);
     }
 
-    public List<SecurityResponseDTO> getSecuritiesDTO(SecurityUser securityUser, Long portfolioId) {
+    public List<SecurityResponseDTO> getSecuritiesDTO(SecurityUser securityUser, Long portfolioId, Pageable pageable) {
         List<SecurityResponseDTO> securities = new ArrayList<>();
         securityRepository
-                .findAllByPortfolioIdAndClientId(portfolioId, securityUser.getId())
+                .findAllByPortfolioIdAndClientId(portfolioId, securityUser.getId(), pageable)
                 .forEach(security -> securities.add(new SecurityResponseDTO(security)));
         return securities;
-    }
-
-    public List<Security> getSecurities(SecurityUser securityUser, Long portfolioId) {
-        return securityRepository
-                .findAllByPortfolioIdAndClientId(portfolioId, securityUser.getId());
     }
 
     public List<StatisticDTO> getNumberOfSecuritiesOfEachType(SecurityUser securityUser, Long portfolioId) {

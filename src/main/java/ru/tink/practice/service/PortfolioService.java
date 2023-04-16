@@ -1,6 +1,8 @@
 package ru.tink.practice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.tink.practice.entity.Portfolio;
@@ -12,7 +14,6 @@ import ru.tink.practice.security.SecurityUser;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class PortfolioService {
         portfolioRepository.deleteById(id);
     }
 
-    public List<Portfolio> getAllPortfolios(SecurityUser user) {
-        return portfolioRepository.findAllByClientId(user.getId());
+    public Page<Portfolio> getAllPortfolios(SecurityUser user, Pageable pageable) {
+        return portfolioRepository.findAllByClientId(user.getId(), pageable);
     }
 }

@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-@Service
+@Service("moex")
 @RequiredArgsConstructor
 @Slf4j
 public class MoexExternalExchangeService implements ExternalExchangeService {
@@ -111,11 +111,6 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         }
         prices.forEach(price -> price.setCurrency(Currency.RUB));
         return prices;
-    }
-
-    @Override
-    public String getServiceName() {
-        return serviceName;
     }
 
     private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(String securityName, String securityType) {

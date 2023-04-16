@@ -49,7 +49,7 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPointImpl()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests().antMatchers("/auth/**").permitAll()
+                .authorizeHttpRequests().antMatchers("/auth/**", "/exchange/**").permitAll()
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());

@@ -16,6 +16,4 @@ public interface ExternalExchangeService {
     BigDecimal getCurrentSecurityPrice(String secid, String securityType);
 
     List<CurrentPriceDTO> getPriceStatisticsByNumberOfDays(String secid, Map<String, String> params);
-
-    String getServiceName();
 }
