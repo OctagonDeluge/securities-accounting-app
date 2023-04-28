@@ -1,128 +1,118 @@
-import React, {useEffect, useState} from "react";
-import axios from "axios";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import "../assets/styles/PortfoliosStyle.css"
 import "../assets/styles/IconStyles.css"
-import {TextInput, ScrollArea, Table} from "@mantine/core";
-import {showNotification} from "@mantine/notifications";
-import {API_URL} from "../constants/API";
+import {ActionIcon, Table, TextInput} from "@mantine/core";
 import {PortfolioCard} from "../components/cards/PortfolioCard";
-import {IconCirclePlus, IconBriefcase, IconCircleCheck} from "@tabler/icons"
+import {IconBriefcase, IconCirclePlus} from "@tabler/icons"
+import {
+    deletePortfolio,
+    getPortfolios, PortfolioService,
+    postPortfolio,
+    putPortfolio,
+    useGetPortfolios
+} from "../api/service/PortfolioRequests";
+import ScrollPagination from "../components/navigation/ScrollPagination";
 
 export function Portfolio() {
     const [portfolios, setPortfolios] = useState([]);
     const [name, setName] = useState("Новый портфель");
+    const [page, setPage] = useState(0);
+    const service
+        = PortfolioService();
+    const observer = useRef();
+
+    const lastPortfolioRef = useCallback(el => {
+        if(loading) return
+        if(observer.current) observer.current.disconnect()
+        observer.current = new IntersectionObserver(entries => {
+            if(entries[0].isIntersecting) {
+                console.log("visible");
+            }
+        })
+        if (el) observer.current.observe(el)
+    }, [loading]);
 
     useEffect(() => {
-        loadPortfolios();
-    }, [])
+        service.request(page)
+    }, [page])
 
-    const deletePortfolio = (id) => {
-        axios
-            .delete(`${API_URL}/portfolio/${id}`)
-            .then(response => {
+    const addStatePortfolio = (name) => {
+        postPortfolio(name)
+            .then(newPortfolio => {
+                //setPortfolios([...portfolios, newPortfolio]);
+                portfolios.push(newPortfolio);
+                setName("Новый портфель");
+            });
+    }
+
+    const deleteStatePortfolio = (id) => {
+        deletePortfolio(id)
+            .then(() => {
                 let clone = [...portfolios].filter(item => item.id !== id);
                 setPortfolios(clone);
-                showNotification({
-                    autoClose: 5000,
-                    title: "Успех",
-                    message: 'Портфель удален',
-                    color: 'green',
-                    icon: <IconCircleCheck/>,
-                })
-            })
+            });
     }
 
-    const updatePortfolio = (id, oldName, newName, setName) => {
-        axios
-            .put(`${API_URL}/portfolio/${id}`, {}, {
-                params: {
-                    portfolioName: newName
-                }
-            })
-            .then(response => {
+    const updateStatePortfolio = (id, oldName, newName, setName) => {
+        putPortfolio(id, newName)
+            .then(result => {
                 let clone = [...portfolios].filter(item => item.id !== id);
-                clone.push(response.data);
+                clone.push(result);
                 setPortfolios(clone);
             })
-            .catch(response => {
-                setName(oldName);
-                let text = "";
-                response.response.data.map(resp => text += resp.fieldName + " " + resp.message);
-                showNotification({
-                    title: "Не удалось обновить портфель",
-                    message: text,
-                    color: "red"
-                })
-            })
+            .catch(() => setName(oldName));
     }
 
-    const addPortfolio = (name) => {
-        axios
-            .post(`${API_URL}/portfolio`, {}, {
-                params: {
-                    portfolioName: name
-                }
-            })
-            .then(response => {
-                setPortfolios([...portfolios, response.data]);
-            })
-            .catch(res => {
-                let text = "";
-                res.response.data.map(resp => text += resp.fieldName + " " + resp.message);
-                showNotification({
-                    title: "Не удалось удалить портфель",
-                    message: text,
-                    color: "red"
-                })
-            })
-    }
-
-    const loadPortfolios = () => {
-        axios
-            .get("http://localhost:8080/portfolio")
-            .then(response => {
-                setPortfolios(response.data)
-            })
-    }
 
     return (
         <div className="portfolioMain">
             <div className="portfolios">
-                <ScrollArea>
-                    <Table sx={{minWidth: 800}} verticalSpacing="xs">
-                        <thead>
-                        <tr>
-                            <th>Портфель</th>
-                            <th>Общая стоимость</th>
-                            <th>Доход</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            portfolios.map(portfolio => (
-                                <PortfolioCard key={portfolio.id} portfolio={portfolio}
-                                               deletePortfolio={deletePortfolio} updatePortfolio={updatePortfolio}/>
-                            ))
-                        }
-                        <tr>
-                            <td>
-                                <TextInput
-                                    onChange={event => setName(event.target.value)}
-                                    variant={'unstyled'}
-                                    value={name}
-                                    icon={<IconBriefcase/>}/>
-                            </td>
-                            <td/>
-                            <td/>
-                            <td>
+                <Table className="table-header">
+                    <thead>
+                    <tr>
+                        <th>Портфель</th>
+                        <th>Общая стоимость</th>
+                        <th/>
+                        <th/>
+                        <th/>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <TextInput
+                                onChange={event => setName(event.target.value)}
+                                variant={'unstyled'}
+                                value={name}
+                                icon={<IconBriefcase/>}/>
+                        </td>
+                        <td>
+                            <ActionIcon onClick={() => addStatePortfolio(name)}>
                                 <IconCirclePlus className='interactiveIcon'
-                                                color={'#32862d'}
-                                                onClick={() => addPortfolio(name)}/>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </Table>
-                </ScrollArea>
+                                                color={'#32862d'}/>
+                            </ActionIcon>
+                        </td>
+                    </tr>
+                    </tbody>
+                </Table>
+                <Table className="table-body">
+                    <tbody>
+                    {
+                        portfolios.map((portfolio, index) => {
+                            if(portfolios.length === index + 1) {
+                                return <PortfolioCard ref={lastPortfolioRef} key={portfolio.id} portfolio={portfolio}
+                                                      deletePortfolio={deleteStatePortfolio}
+                                                      updatePortfolio={updateStatePortfolio}/>
+                            }
+                            else {
+                                return <PortfolioCard key={portfolio.id} portfolio={portfolio}
+                                                      deletePortfolio={deleteStatePortfolio}
+                                                      updatePortfolio={updateStatePortfolio}/>
+                            }
+                        })
+                    }
+                    </tbody>
+                </Table>
             </div>
         </div>
     )
