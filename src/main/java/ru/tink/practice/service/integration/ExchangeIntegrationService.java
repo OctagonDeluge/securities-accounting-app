@@ -1,12 +1,10 @@
 package ru.tink.practice.service.integration;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import ru.tink.practice.dto.external.moex.CurrentPriceDTO;
-import ru.tink.practice.dto.external.moex.PaymentDTO;
-import ru.tink.practice.dto.external.moex.SecurityFullInfoDTO;
-import ru.tink.practice.dto.external.moex.SecurityShortInfoDTO;
+import ru.tink.practice.dto.external.moex.*;
 import ru.tink.practice.exception.NoSuchExchangeException;
 import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
@@ -16,6 +14,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExchangeIntegrationService {
 
     private final ApplicationContext context;
@@ -26,16 +25,16 @@ public class ExchangeIntegrationService {
         return securities;
     }*/
 
-    public List<SecurityShortInfoDTO> loadSecuritiesByExchange(String exchangeName, Integer page, String securityName) {
-        return determineExchange(exchangeName).getSecuritiesByName(page, securityName);
+    public List<SecurityShortInfoDTO> loadSecuritiesByExchange(String exchangeName, String securityName) {
+        return determineExchange(exchangeName).getSecuritiesByName(securityName);
     }
 
     public SecurityFullInfoDTO getSecurityBySecid(String secid, String exchangeName) {
         return determineExchange(exchangeName).getSecurityBySecid(secid);
     }
 
-    public List<PaymentDTO> getPaymentsBySecid(String exchangeName, String secid, Integer page) {
-        return determineExchange(exchangeName).getPaymentsBySecid(secid, page);
+    public List<PaymentDTO> getPaymentsBySecid(String exchangeName, String secid) {
+        return determineExchange(exchangeName).getPaymentsBySecid(secid);
     }
 
     public BigDecimal getCurrentSecurityPrice(String secid, String securityType, String exchangeName) {
@@ -44,6 +43,13 @@ public class ExchangeIntegrationService {
 
     public List<CurrentPriceDTO> getPricesForNumberOfDays(String secid, String exchangeName, Map<String, String> params) {
         return determineExchange(exchangeName).getPriceStatisticsByNumberOfDays(secid, params);
+    }
+
+    public List<DividendDTO> getDividends(String exchangeName, String secid) {
+        return determineExchange(exchangeName).getDividendsInfo(secid);
+    }
+    public CouponsDTO getCoupons(String exchangeName, String secid) {
+        return determineExchange(exchangeName).getCouponsInfo(secid);
     }
 
     private ExternalExchangeService determineExchange(String exchangeName) {

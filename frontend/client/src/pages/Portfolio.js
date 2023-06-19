@@ -5,63 +5,33 @@ import {ActionIcon, Table, TextInput} from "@mantine/core";
 import {PortfolioCard} from "../components/cards/PortfolioCard";
 import {IconBriefcase, IconCirclePlus} from "@tabler/icons"
 import {
-    deletePortfolio,
-    getPortfolios, PortfolioService,
-    postPortfolio,
-    putPortfolio,
-    useGetPortfolios
+    PortfolioService
 } from "../api/service/PortfolioRequests";
-import ScrollPagination from "../components/navigation/ScrollPagination";
 
 export function Portfolio() {
-    const [portfolios, setPortfolios] = useState([]);
-    const [name, setName] = useState("Новый портфель");
+    const TEMPLATE = "Изменить имя"
+    const [name, setName] = useState(TEMPLATE);
     const [page, setPage] = useState(0);
     const service
         = PortfolioService();
+
+    useEffect(() => {
+        const d = setTimeout(() => {
+            service.getPortfolios(page);
+        }, 500);
+    }, [page])
+
     const observer = useRef();
 
     const lastPortfolioRef = useCallback(el => {
-        if(loading) return
-        if(observer.current) observer.current.disconnect()
+        if(observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
-            if(entries[0].isIntersecting) {
-                console.log("visible");
+            if(entries[0].isIntersecting && service.hasMore) {
+                setPage(prevState => prevState+1);
             }
         })
         if (el) observer.current.observe(el)
-    }, [loading]);
-
-    useEffect(() => {
-        service.request(page)
-    }, [page])
-
-    const addStatePortfolio = (name) => {
-        postPortfolio(name)
-            .then(newPortfolio => {
-                //setPortfolios([...portfolios, newPortfolio]);
-                portfolios.push(newPortfolio);
-                setName("Новый портфель");
-            });
-    }
-
-    const deleteStatePortfolio = (id) => {
-        deletePortfolio(id)
-            .then(() => {
-                let clone = [...portfolios].filter(item => item.id !== id);
-                setPortfolios(clone);
-            });
-    }
-
-    const updateStatePortfolio = (id, oldName, newName, setName) => {
-        putPortfolio(id, newName)
-            .then(result => {
-                let clone = [...portfolios].filter(item => item.id !== id);
-                clone.push(result);
-                setPortfolios(clone);
-            })
-            .catch(() => setName(oldName));
-    }
+    }, [service.loading, service.hasMore]);
 
 
     return (
@@ -82,12 +52,13 @@ export function Portfolio() {
                         <td>
                             <TextInput
                                 onChange={event => setName(event.target.value)}
+                                onFocus={event => event.target.select()}
                                 variant={'unstyled'}
                                 value={name}
                                 icon={<IconBriefcase/>}/>
                         </td>
                         <td>
-                            <ActionIcon onClick={() => addStatePortfolio(name)}>
+                            <ActionIcon onClick={() => {service.postPortfolio(name); setName(TEMPLATE)}}>
                                 <IconCirclePlus className='interactiveIcon'
                                                 color={'#32862d'}/>
                             </ActionIcon>
@@ -98,19 +69,20 @@ export function Portfolio() {
                 <Table className="table-body">
                     <tbody>
                     {
-                        portfolios.map((portfolio, index) => {
-                            if(portfolios.length === index + 1) {
+                        service.portfolios.map((portfolio, index) => {
+                            if(service.portfolios.length-1 === index) {
                                 return <PortfolioCard ref={lastPortfolioRef} key={portfolio.id} portfolio={portfolio}
-                                                      deletePortfolio={deleteStatePortfolio}
-                                                      updatePortfolio={updateStatePortfolio}/>
+                                                      deletePortfolio={service.deletePortfolio}
+                                                      updatePortfolio={service.putPortfolio}/>
                             }
                             else {
                                 return <PortfolioCard key={portfolio.id} portfolio={portfolio}
-                                                      deletePortfolio={deleteStatePortfolio}
-                                                      updatePortfolio={updateStatePortfolio}/>
+                                                      deletePortfolio={service.deletePortfolio}
+                                                      updatePortfolio={service.putPortfolio}/>
                             }
                         })
                     }
+                    <tr><td>{service.loading && 'Loading...'}</td></tr>
                     </tbody>
                 </Table>
             </div>

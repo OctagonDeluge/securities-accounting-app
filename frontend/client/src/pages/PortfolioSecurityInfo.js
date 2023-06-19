@@ -1,23 +1,24 @@
 import {useNavigate, useParams} from "react-router-dom";
-import axios from "axios";
+import {axios} from "../api/axios";
 import {API_URL} from "../constants/API";
 import React, {useEffect, useState} from "react";
 import {SecurityPriceChart} from "../components/charts/SecurityPriceChart";
-import {Title, Text, Table, ScrollArea} from "@mantine/core";
+import {Button, Modal, NumberInput, Table, Text, Title} from "@mantine/core";
 import "../assets/styles/PortfolioSecurityInfoStyles.css"
 import {PurchaseInfoCard} from "../components/cards/PurchaseInfoCard";
-import {IconCircleCheck, IconSquareX} from "@tabler/icons";
-import {showNotification} from "@mantine/notifications";
+import {IconQuestionMark, IconRefresh} from "@tabler/icons";
 import {PaymentCard} from "../components/cards/PaymentCard";
+import {TradingRequests} from "../api/service/TradingRequests";
+import {useExchangePrices} from "../api/service/ExchangeRequests";
 
-export function PortfolioSecurityInfo() {
+export function PortfolioSecurityInfo({state}) {
     const {securityId} = useParams();
     const [security, setSecurity] = useState({
-        id: "",
+        id: 0,
         secid: "",
         name: "",
-        totalCost: "",
-        profit: "",
+        totalCost: 0,
+        profit: 0,
         group: "",
         exchangeName: "",
         currency: "",
@@ -25,7 +26,11 @@ export function PortfolioSecurityInfo() {
     });
     const [purchaseInfos, setPurchaseInfos] = useState([]);
     const [payments, setPayments] = useState([]);
+    const [opened, setOpened] = useState(false);
     const [deleted, setDeleted] = useState(false);
+    const [number, setNumber] = useState(1);
+    const service = TradingRequests();
+    const exchangeService = useExchangePrices();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,7 +38,7 @@ export function PortfolioSecurityInfo() {
     }, []);
 
     useEffect(() => {
-        if(deleted) {
+        if (deleted) {
             navigate(-1);
         }
     }, [deleted]);
@@ -49,14 +54,8 @@ export function PortfolioSecurityInfo() {
     }
 
     const loadPurchaseInfos = (security) => {
-        let ids = [];
-        security.purchaseInfos.map(object => ids.push(object.id));
         axios
-            .get(`${API_URL}/purchaseInfo`, {
-                params: {
-                    purchaseIds: ids.toString()
-                }
-            })
+            .get(`${API_URL}/purchaseInfo/security/${security.id}`)
             .then(response => {
                 setPurchaseInfos(response.data);
             });
@@ -70,27 +69,22 @@ export function PortfolioSecurityInfo() {
             });
     }
 
-    const deleteSecurity = (id) => {
-        axios
-            .delete(`${API_URL}/security/${id}`)
-            .then(response => {
-                showNotification({
-                    autoClose: 5000,
-                    title: "Успех",
-                    message: 'Ценная бумага удалена из портфеля',
-                    color: 'green',
-                    icon: <IconCircleCheck/>,
-                })
-                setDeleted(true);
-            })
-            .catch(reason => {
-                console.log(reason);
-            })
+    const sellSecurity = () => {
+        let saleRequest = {
+            securityId: security.id,
+            price: exchangeService.price,
+            quantity: number,
+            walletId: state.wallet.id
+        }
+        service.sellSecurity(saleRequest, state);
     }
 
     return (
         <div className="securityInfo">
-            <IconSquareX onClick={() => deleteSecurity(security.id)} size={32} color={'#fc0202'} className="action"/>
+            <Button className="action" onClick={() => {
+                setOpened(true);
+                exchangeService.request(security.secid, security.group)
+            }}>Продать</Button>
             <Title>{security.secid}</Title>
             <Title>{security.name}</Title>
             <div className="statistic">
@@ -100,46 +94,58 @@ export function PortfolioSecurityInfo() {
                 {security.profit >= 0 ?
                     <Text size='xl' color="#008000">+{security.profit} {security.currency}</Text>
                     :
-                    <Text size='xl' color="red">-{security.profit} {security.currency}</Text>}
+                    <Text size='xl' color="red">{security.profit} {security.currency}</Text>}
             </div>
             <SecurityPriceChart entity={security}/>
             <Title order={4}>История</Title>
-            <ScrollArea>
-                <Table highlightOnHover={true} sx={{minWidth: 800}} verticalSpacing="xs">
-                    <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Сумма</th>
-                        <th>Количество</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        purchaseInfos.map(purchase => (
-                            <PurchaseInfoCard key={purchase.id} purchase={purchase}/>
-                        ))
-                    }
-                    </tbody>
-                </Table>
-            </ScrollArea>
+            <Table highlightOnHover={true} sx={{width: "40%"}} verticalSpacing="xs">
+                <thead>
+                <tr>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                    purchaseInfos.map(purchase => (
+                        <PurchaseInfoCard key={purchase.id} purchase={purchase}/>
+                    ))
+                }
+                </tbody>
+            </Table>
             {security.group === "shares" ? <Title order={4}>Дивиденды</Title> : <Title order={4}>Купоны</Title>}
-            <ScrollArea>
-                <Table highlightOnHover={true} sx={{minWidth: 800}} verticalSpacing="xs">
-                    <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Сумма</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        payments.map(payment => (
-                            <PaymentCard key={payment.paymentDate} payment={payment}/>
-                        ))
-                    }
-                    </tbody>
-                </Table>
-            </ScrollArea>
+            <Table highlightOnHover={true} sx={{width: "40%"}} verticalSpacing="xs">
+                <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                    payments.map(payment => (
+                        <PaymentCard key={payment.paymentDate} payment={payment}/>
+                    ))
+                }
+                </tbody>
+            </Table>
+            <Modal opened={opened} onClose={() => setOpened(false)} title='Укажите количество ценных бумаг'>
+                <Text>Цена продажи составит {exchangeService.price}</Text>
+                <IconRefresh onClick={() => exchangeService.request(security.secid, security.group)}/>
+
+                <NumberInput
+                    style={{paddingBottom: 20}}
+                    value={number}
+                    onChange={(val) => setNumber(val)}
+                    label="Количество ценных бумаг"
+                    description="Минимальное количество - 1"
+                    min={1}
+                />
+                <Button component="button" onClick={() => {
+                    sellSecurity();
+                    setOpened(false)
+                }}>Продать</Button>
+            </Modal>
         </div>
     )
 }

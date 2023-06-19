@@ -11,10 +11,17 @@ import org.springframework.stereotype.Component;
 public class SchedulersComponent {
 
     private final ProfitCalculationService profitCalculationService;
+    private final PaymentAccrualService paymentAccrualService;
 
-    @Scheduled(cron = "0 0/10 * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void calculateProfit() {
         log.info("profit calculation");
-        //profitCalculationService.calculateProfit();
+        profitCalculationService.calculateProfit();
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    public void calculatePayments() {
+        log.info("payments calculation");
+        paymentAccrualService.paymentsAccrual();
     }
 }

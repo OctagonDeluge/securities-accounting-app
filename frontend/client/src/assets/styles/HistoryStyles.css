@@ -1,0 +1,10 @@
+.history table thead tr th {
+    text-align: center;
+    width: 10%;
+}
+
+.history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

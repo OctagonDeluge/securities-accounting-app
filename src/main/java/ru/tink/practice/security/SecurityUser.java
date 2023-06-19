@@ -6,7 +6,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.tink.practice.entity.Role;
+import ru.tink.practice.entity.enumeration.Level;
+import ru.tink.practice.entity.enumeration.Role;
 import ru.tink.practice.entity.User;
 
 import java.util.Collection;
@@ -20,6 +21,7 @@ public class SecurityUser implements UserDetails {
     private String email;
     private String password;
     private String name;
+    private Level level;
     private Role role;
     private Boolean enabled;
     private Boolean authenticated;
@@ -30,6 +32,7 @@ public class SecurityUser implements UserDetails {
         this.password = user.getPassword();
         this.name = user.getName();
         this.role = user.getRole();
+        this.level = user.getLevel();
         this.enabled = user.getEnabled();
         this.authenticated = user.getAuthenticated();
     }

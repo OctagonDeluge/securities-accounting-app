@@ -1,41 +1,32 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {IconSearch} from "@tabler/icons";
 import {Autocomplete, ScrollArea, Table, Button} from "@mantine/core";
 import {SecurityShortInfoCard} from "../components/cards/SecurityShortInfoCard";
 import {TabsHeader} from "../components/headers/TabsHeader";
 import "../assets/styles/ExchangeStyles.css"
+import {useExchangeSearch} from "../api/service/ExchangeRequests";
 
 export function Exchange() {
-    const [searchValue, setSearchValue] = useState('');
-    const [securities, setSecurities] = useState([]);
+    const [query, setQuery] = useState('Рос');
 
-    const searchSecurity = () => {
-        axios
-            .get(`http://localhost:8080/exchange/${searchValue}`)
-            .then(response => {
-                setSecurities(response.data);
-            })
-    }
+    const {securities} = useExchangeSearch(query);
 
     return (
         <div className="exchange">
             <TabsHeader tab={"exchange"}/>
             <div className="searchSection">
                 <Autocomplete
-                    value={searchValue}
-                    onChange={setSearchValue}
+                    value={query}
+                    onChange={setQuery}
                     placeholder="Поиск"
                     icon={<IconSearch size={16} stroke={1.5}/>}
                     data={['Сбер', 'VTB', 'Рос']}
                 />
-                <Button component="button" onClick={searchSecurity}>
-                    Поиск
-                </Button>
+
 
             </div>
             <div className="searchResult">
-                <ScrollArea>
                     <Table highlightOnHover={true} sx={{minWidth: 800}} verticalSpacing="xs">
                         <thead>
                         <tr>
@@ -46,13 +37,14 @@ export function Exchange() {
                         </thead>
                         <tbody>
                         {
+                            Array.isArray(securities) ?
                             securities.map(security => (
                                 <SecurityShortInfoCard key={security.id} security={security}/>
                             ))
+                                : console.log(Array.isArray(securities))
                         }
                         </tbody>
                     </Table>
-                </ScrollArea>
             </div>
         </div>
     )

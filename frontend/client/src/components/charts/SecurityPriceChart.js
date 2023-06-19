@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
-import axios from "axios";
+import {axios} from "../../api/axios";
 import {API_URL} from "../../constants/API";
 import {PriceChart} from "./PriceChart";
 import {SegmentedControl} from "@mantine/core";
 import "../../assets/styles/ChartStyles.css"
+import {showNotification} from "@mantine/notifications";
+import {IconCircleX} from "@tabler/icons";
 
 const beginDate = new Date().setHours(0, 0, 0, 1);
 const endDate = new Date().setHours(23, 59, 59, 999);
@@ -41,7 +43,13 @@ export function SecurityPriceChart({entity}) {
                 setPrices(response.data)
             })
             .catch(response => {
-                console.log(response);
+                showNotification({
+                    autoClose: 5000,
+                    title: "Ошибка",
+                    message: response,
+                    color: 'red',
+                    icon: <IconCircleX/>,
+                })
             })
     }
 
@@ -53,7 +61,7 @@ export function SecurityPriceChart({entity}) {
                 fullWidth={true}
                 onChange={value => {setDays(value); getPrices(value[0], endDate, value[1], entity.group);}}
                 data={[
-                    {label: '1 день', value: [beginDate - countDays(1), 10]},
+                    {label: '1 день', value: [beginDate, 1]},
                     {label: '3 дня', value: [beginDate - countDays(3), 10]},
                     {label: '1 неделя', value: [beginDate - countDays(7), 60]},
                     {label: '1 месяц', value: [beginDate - countDays(30), 60]},

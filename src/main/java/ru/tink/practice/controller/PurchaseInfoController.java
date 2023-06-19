@@ -21,11 +21,10 @@ public class PurchaseInfoController {
     private final PurchaseInfoService purchaseInfoService;
 
     @GetMapping("/security/{securityId}")
-    public List<PurchaseInfo> getPurchaseInfos(Authentication authentication, @PathVariable Long securityId, @RequestParam Integer page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+    public List<PurchaseInfo> getPurchaseInfos(Authentication authentication, @PathVariable Long securityId) {
+        //Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         return purchaseInfoService
-                .getAllPurchaseInfosById(securityId, (SecurityUser) authentication.getPrincipal(), pageable)
-                .getContent();
+                .getAllPurchaseInfosById(securityId, (SecurityUser) authentication.getPrincipal());
     }
 
 }

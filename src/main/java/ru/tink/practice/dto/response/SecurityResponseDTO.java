@@ -17,6 +17,7 @@ public class SecurityResponseDTO {
     private String name;
     private BigDecimal totalCost;
     private BigDecimal profit;
+    private Integer quantity;
     private String group;
     private String exchangeName;
     private Currency currency;
@@ -27,6 +28,7 @@ public class SecurityResponseDTO {
         name = security.getName();
         totalCost = security.getTotalCost();
         profit = security.getProfit();
+        quantity = security.getQuantity();
         group = security.getType().getName();
         exchangeName = security.getExchange().getName();
         currency = security.getCurrency();

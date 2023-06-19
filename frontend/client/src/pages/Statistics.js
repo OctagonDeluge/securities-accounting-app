@@ -1,29 +1,21 @@
-import React, {useEffect, useState} from "react";
-import axios from "axios";
-import {API_URL} from "../constants/API";
+import React, {useEffect} from "react";
 import {useParams} from "react-router-dom";
-import {TypeConverterForStatistics} from "../util/TypeConverter";
 import "../assets/styles/StatisticsStyles.css"
 import {SecurityTypeChart} from "../components/charts/SecurityTypeChart";
 import {Title} from "@mantine/core";
 import {TabsHeader} from "../components/headers/TabsHeader";
+import {useSecurityTypeStatistics} from "../api/service/StatisticsRequests";
 
 export function Statistics() {
     const {portfolioId} = useParams();
-    const [statistics, setStatistics] = useState([]);
+    const statisticsService = useSecurityTypeStatistics();
     const namings = {
         dataKey: "value",
         nameKey: "name"
     }
 
     useEffect(() => {
-        axios
-            .get(`${API_URL}/statistics/portfolio/${portfolioId}`)
-            .then(res => {
-                const temp = [];
-                res.data.forEach(value => temp.push({name: TypeConverterForStatistics(value.type), value: value.count}));
-                setStatistics(temp);
-            })
+        statisticsService.getStatistics(portfolioId);
     }, [])
 
     return (
@@ -31,7 +23,7 @@ export function Statistics() {
             <TabsHeader tab={"statistics"}/>
             <div className="pieChartSection">
                 <Title>Типы бумаг</Title>
-                <SecurityTypeChart data={statistics} namings={namings}/>
+                <SecurityTypeChart data={statisticsService.statistics} namings={namings}/>
             </div>
         </div>
     )

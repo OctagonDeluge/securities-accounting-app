@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tink.practice.entity.RefreshToken;
 import ru.tink.practice.entity.User;
 import ru.tink.practice.exception.RefreshTokenExpiredException;
@@ -11,6 +12,9 @@ import ru.tink.practice.exception.RefreshTokenNotFoundException;
 import ru.tink.practice.repository.RefreshTokenRepository;
 import ru.tink.practice.repository.UserRepository;
 
+import java.sql.Ref;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,16 +29,28 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
-    public RefreshToken findByToken(String token) {
+    @Transactional
+    public RefreshToken updateRefreshToken(String oldRefreshToken) {
+        RefreshToken refreshToken = findByToken(oldRefreshToken);
+        validateRefreshToken(refreshToken);
+        return updateRefreshToken(refreshToken.getClient(), refreshToken);
+    }
+
+    public RefreshToken getRefreshToken(Long userId) {
+        RefreshToken refreshToken =  refreshTokenRepository.findByClientId(userId).orElse(null);
+        if(refreshToken == null || (refreshToken.getExpirationTime() < new Date().getTime())) {
+            refreshToken = createRefreshToken(userId);
+        }
+
+        return refreshToken;
+    }
+
+    private RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .orElseThrow(RefreshTokenNotFoundException::new);
     }
 
-    public Optional<RefreshToken> findByUserId(Long userId) {
-        return refreshTokenRepository.findByClientId(userId);
-    }
-
-    public RefreshToken createRefreshToken(Long userId) {
+    private RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken(
                 UUID.randomUUID().toString(),
                 new Date().getTime() + expirationDays*24L*60L*60L*1000L,
@@ -44,7 +60,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken updateRefreshToken(User user, RefreshToken refreshToken) {
+    private RefreshToken updateRefreshToken(User user, RefreshToken refreshToken) {
         refreshTokenRepository.delete(refreshToken);
         RefreshToken token = new RefreshToken(
                 UUID.randomUUID().toString(),
@@ -54,12 +70,10 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(token);
     }
 
-    public RefreshToken validateRefreshToken(RefreshToken token) {
+    private void validateRefreshToken(RefreshToken token) {
         if(new Date().getTime() > token.getExpirationTime()) {
             refreshTokenRepository.delete(token);
             throw new RefreshTokenExpiredException(token.getToken());
         }
-
-        return token;
     }
 }

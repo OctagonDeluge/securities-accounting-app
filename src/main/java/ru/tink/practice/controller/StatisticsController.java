@@ -16,6 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/statistics")
 public class StatisticsController {
+
     private final ExchangeIntegrationService exchangeIntegrationService;
     private final SecurityService securityService;
 
@@ -32,4 +33,6 @@ public class StatisticsController {
         return securityService
                 .getNumberOfSecuritiesOfEachType((SecurityUser) authentication.getPrincipal(),portfolioId);
     }
+
+    //:TODO add rating of users endpoint
 }

@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 public interface ExternalExchangeService {
-    List<SecurityShortInfoDTO> getSecuritiesByName(Integer page, String securityName);
-
-    List<PaymentDTO> getPaymentsBySecid(String secid, Integer page);
+    List<SecurityShortInfoDTO> getSecuritiesByName(String securityName);
 
     SecurityFullInfoDTO getSecurityBySecid(String secid);
 
     BigDecimal getCurrentSecurityPrice(String secid, String securityType);
 
     List<CurrentPriceDTO> getPriceStatisticsByNumberOfDays(String secid, Map<String, String> params);
+
+    List<PaymentDTO> getPaymentsBySecid(String secid);
+
+    List<DividendDTO> getDividendsInfo(String secid);
+    CouponsDTO getCouponsInfo(String secid);
 }

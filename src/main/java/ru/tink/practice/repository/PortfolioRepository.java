@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface PortfolioRepository extends
         PagingAndSortingRepository<Portfolio, Long>, JpaRepository<Portfolio, Long> {
 
-    Page<Portfolio> findAllByClientId(Long clientId, Pageable pageable);
+    Page<Portfolio> findAllByClientIdOrderByIdDesc(Long clientId, Pageable pageable);
 
     Optional<Portfolio> findByIdAndClientId(Long id, Long clientId);
 }

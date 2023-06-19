@@ -16,7 +16,6 @@ public class Portfolio {
     private Long id;
     private String name;
     private BigDecimal totalCost;
-    private BigDecimal profit;
 
     @ToString.Exclude
     @JsonIgnore
@@ -26,9 +25,8 @@ public class Portfolio {
     @ManyToOne(fetch = FetchType.LAZY)
     private User client;
 
-    public Portfolio(String name, BigDecimal totalCost, BigDecimal profit, User user) {
+    public Portfolio(String name, BigDecimal totalCost, User user) {
         this.name = name;
-        this.profit = profit;
         this.totalCost = totalCost;
         this.client = user;
     }

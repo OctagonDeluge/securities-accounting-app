@@ -54,14 +54,14 @@ export function SecurityCard({security}) {
                 </Group>
 
                 <Group align="flex-end" spacing="xs" mt={25}>
-                    <Text className={classes.value}>{parseFloat(security.totalCost.toFixed(2))}</Text>
+                    <Text className={classes.value}>{parseFloat(security.totalCost.toFixed(2))} {security.currency}</Text>
                     <Text
                         color={security.profit >= 0 ? 'teal' : 'red'}
                         size="sm"
                         weight={500}
                         className={classes.profit}
                     >
-                        <span>{parseFloat(security.profit.toFixed(2))}</span>
+                        <span>{security.profit.toFixed(2)} {security.currency}</span>
                         <DiffIcon size={16} stroke={1.5} />
                     </Text>
                 </Group>

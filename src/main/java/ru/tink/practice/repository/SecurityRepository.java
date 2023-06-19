@@ -20,10 +20,12 @@ public interface SecurityRepository extends PagingAndSortingRepository<Security,
 
     Page<Security> findAllByPortfolioIdAndClientId(Long portfolioId, Long clientId, Pageable pageable);
 
+    List<Security> findAllByPortfolioIdAndClientId(Long portfolioId, Long clientId);
+
     Security findByPortfolioIdAndSecid(Long portfolioId, String secid);
 
     @Query(value = "select type, count(1) from " +
-            "(select type from security where portfolio_id = ?1 and client_id = ?2) as st\n" +
+            "(select type from investments.security where portfolio_id = ?1 and client_id = ?2) as st\n" +
             "group by type", nativeQuery = true)
     List<StatisticDTO> countBySecurityType(Long portfolioId, Long clientId);
 }

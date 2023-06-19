@@ -46,14 +46,13 @@ export function NotFound() {
     return (
         <Container className={classes.root}>
             <div className={classes.label}>404</div>
-            <Title className={classes.title}>You have found a secret place.</Title>
+            <Title className={classes.title}>Вы достигли секретного места.</Title>
             <Text color="dimmed" size="lg" align="center" className={classes.description}>
-                Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has
-                been moved to another URL.
+                Возможно вы ввели неверный адрес или страница не существует.
             </Text>
             <Group position="center">
-                <Button variant="subtle" size="md" component="button" onClick={()=>navigate("/portfolio")}>
-                    Take me back to home page
+                <Button variant="subtle" size="md" component="button" onClick={()=>navigate("/signin")}>
+                    Обратно домой
                 </Button>
             </Group>
         </Container>

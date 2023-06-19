@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CouponDTO {
+public class CouponDTO implements Payment {
     @JsonProperty("coupondate")
     private LocalDate couponDate;
     @JsonProperty("value_rub")
@@ -26,5 +26,20 @@ public class CouponDTO {
         payment.setCost(cost);
         payment.setCurrency(currency);
         return payment;
+    }
+
+    @Override
+    public LocalDate getPaymentDate() {
+        return couponDate;
+    }
+
+    @Override
+    public BigDecimal getPaymentCost() {
+        return cost;
+    }
+
+    @Override
+    public Currency getPaymentCurrency() {
+        return currency;
     }
 }

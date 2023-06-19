@@ -3,6 +3,5 @@ package ru.tink.practice.enumeration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum Currency {
-    @JsonProperty("RUB")
-    RUB
+    RUB, USD
 }

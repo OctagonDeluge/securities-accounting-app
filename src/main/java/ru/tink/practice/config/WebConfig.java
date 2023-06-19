@@ -14,6 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${client.url}")
     private String clientUrl;
+
     @Bean
     public RestTemplate createRestTemplate() {
         return new RestTemplate();

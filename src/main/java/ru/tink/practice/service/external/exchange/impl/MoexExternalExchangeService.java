@@ -20,6 +20,9 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service("moex")
@@ -42,10 +45,10 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     private final Integer LIMIT = 10;
 
     @Override
-    public List<SecurityShortInfoDTO> getSecuritiesByName(Integer page, String securityName) {
+    public List<SecurityShortInfoDTO> getSecuritiesByName(String securityName) {
         List<SecurityShortInfoDTO> securities =
-                getSecuritiesGroupedByType(page, securityName, SecurityDTOType.SHARE.getType())[1].getSecurities();
-        securities.addAll(getSecuritiesGroupedByType(page, securityName, SecurityDTOType.BOND.getType())[1].getSecurities());
+                getSecuritiesGroupedByType(securityName, SecurityDTOType.SHARE.getType())[1].getSecurities();
+        securities.addAll(getSecuritiesGroupedByType(securityName, SecurityDTOType.BOND.getType())[1].getSecurities());
         securities.forEach(security -> security.setExchangeName(serviceName));
         return securities;
     }
@@ -64,14 +67,14 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
     }
 
     @Override
-    public List<PaymentDTO> getPaymentsBySecid(String secid, Integer page) {
+    public List<PaymentDTO> getPaymentsBySecid(String secid) {
         String securityGroup = getSecurityDescription(secid).get("group");
         List<PaymentDTO> payments = new ArrayList<>();
         if(securityGroup.contains(SecurityType.SHARE.getName())) {
-            getDividends(secid, page)
+            getDividends(secid)
                     .forEach(dividend -> payments.add(dividend.toPayment()));
         } else {
-            getCoupons(secid, page)
+            getCoupons(secid)
                     .forEach(coupon -> payments.add(coupon.toPayment()));
         }
         return payments;
@@ -86,7 +89,8 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .pathSegment("candles.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.reverse", "true")
-                .queryParam("from", LocalDate.now().minusDays(3))
+                .queryParam("from", findInterval())
+                .queryParam("interval", 1)
                 .queryParam("iss.json", "extended")
                 .queryParam("candles.columns", "close,end").build().toUri();
         return getPrices(secid, destUrl, securityType).get(0).getClose();
@@ -107,6 +111,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("from", formatter.format(new Date(Long.parseLong(params.get(FROM_DATE_KEY)))))
                 .queryParam("till", formatter.format(new Date(Long.parseLong(params.get(TILL_DATE_KEY)))))
                 .queryParam("interval", Integer.parseInt(params.get(DAY_INTERVAL_KEY))).build().toUri();
+        log.info(destUrl.toString());
         List<CurrentPriceDTO> prices =
                 restTemplate.getForObject(destUrl, CurrentPricesDTO[].class)[1].getCurrentPrices();
         if(Market.of(params.get(SECURITY_TYPE_KEY)).equals(SecurityType.BOND.getName())) {
@@ -116,7 +121,29 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return prices;
     }
 
-    private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(Integer page, String securityName, String securityType) {
+    @Override
+    public List<DividendDTO> getDividendsInfo(String secid) {
+        return getDividends(secid);
+    }
+
+    @Override
+    public CouponsDTO getCouponsInfo(String secid) {
+        URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
+                .pathSegment("securities")
+                .pathSegment(secid)
+                .pathSegment("bondization.json")
+                .queryParam("iss.meta", "off")
+                .queryParam("iss.json", "extended")
+                .queryParam("iss.only", "amortizations,coupons")
+                .queryParam("coupons.columns", "coupondate,value_rub,faceunit")
+                .queryParam("amortizations.columns", "amortdate,value_rub,faceunit")
+                .queryParam("limit", 100)
+                .build().toUri();
+
+        return restTemplate.getForObject(destUrl, CouponsDTO[].class)[1];
+    }
+
+    private SecuritiesShortInfoDTO[] getSecuritiesGroupedByType(String securityName, String securityType) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities.json")
                 .queryParam("iss.meta", "off")
@@ -124,8 +151,6 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("securities.columns", "id,secid,shortname,name,group")
                 .queryParam("group_by_filter", securityType)
                 .queryParam("group_by", "group")
-                .queryParam("limit", LIMIT)
-                .queryParam("start", page*LIMIT)
                 .queryParam("q", securityName).build().toUri();
         return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);
     }
@@ -164,7 +189,7 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
         return currentPrices.getCurrentPrices();
     }
 
-    private List<CouponDTO> getCoupons(String secid, Integer page) {
+    private List<CouponDTO> getCoupons(String secid) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities")
                 .pathSegment(secid)
@@ -173,24 +198,34 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("iss.json", "extended")
                 .queryParam("iss.only", "coupons")
                 .queryParam("coupons.columns", "coupondate,value_rub,faceunit")
-                .queryParam("limit", LIMIT)
-                .queryParam("start", page*LIMIT)
                 .build().toUri();
 
         return restTemplate.getForObject(destUrl, CouponsDTO[].class)[1].getCoupons();
     }
 
-    private List<DividendDTO> getDividends(String secid, Integer page) {
+    private List<DividendDTO> getDividends(String secid) {
         URI destUrl = UriComponentsBuilder.fromHttpUrl(url)
                 .pathSegment("securities")
                 .pathSegment(secid)
                 .pathSegment("dividends.json")
                 .queryParam("iss.meta", "off")
                 .queryParam("iss.json", "extended")
-                .queryParam("limit", LIMIT)
-                .queryParam("start", page*LIMIT)
                 .build().toUri();
 
         return restTemplate.getForObject(destUrl, DividendsDTO[].class)[1].getDividends();
+    }
+
+    private String findInterval() {
+        LocalDate interval = LocalDate.now();
+        int today = interval.getDayOfWeek().getValue();
+        if (today == 7) {
+            interval = interval.minusDays(2L);
+        } else if (today > 1) {
+            interval = interval.minusDays(1L);
+        }
+        log.info(LocalDateTime.of(interval, LocalTime.of(9, 30, 0))
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        return LocalDateTime.of(interval, LocalTime.of(9, 30, 0))
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }

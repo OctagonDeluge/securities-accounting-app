@@ -3,6 +3,7 @@ package ru.tink.practice.service.scheduled;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.tink.practice.entity.Portfolio;
 import ru.tink.practice.entity.PurchaseInfo;
 import ru.tink.practice.entity.Security;
@@ -10,7 +11,6 @@ import ru.tink.practice.service.PortfolioService;
 import ru.tink.practice.service.SecurityService;
 import ru.tink.practice.service.integration.ExchangeIntegrationService;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -23,14 +23,13 @@ public class ProfitCalculationService {
     private final SecurityService securityService;
     private final PortfolioService portfolioService;
 
-    /*@Transactional
+    @Transactional
     public void calculateProfit() {
         List<Portfolio> portfolios = portfolioService.getAllPortfolios();
         for (Portfolio portfolio : portfolios) {
-            BigDecimal portfolioProfit = BigDecimal.valueOf(0);
             BigDecimal portfolioPrice = BigDecimal.valueOf(0);
             List<Security> securities =
-                    securityService.getSecurities(portfolio.getId());
+                    portfolio.getSecurities();
             for (Security security : securities) {
                 BigDecimal securityProfit = BigDecimal.valueOf(0);
                 BigDecimal securityPrice = BigDecimal.valueOf(0);
@@ -50,11 +49,22 @@ public class ProfitCalculationService {
                 security.setProfit(securityProfit);
                 securityService.saveSecurity(security);
                 portfolioPrice = portfolioPrice.add(securityPrice);
-                portfolioProfit = portfolioProfit.add(securityProfit);
             }
             portfolio.setTotalCost(portfolioPrice);
-            portfolio.setProfit(portfolioProfit);
-            portfolioService.savePortfolio(portfolio);
         }
-    }*/
+    }
+
+    @Transactional
+    public void calculateSecurityProfit(Long securityId, BigDecimal priceOnSelling) {
+        Security security = securityService.getSecurity(securityId);
+        Portfolio portfolio = security.getPortfolio();
+        BigDecimal securityProfit = BigDecimal.valueOf(0);
+        for (PurchaseInfo purchaseInfo : security.getPurchaseInfos()) {
+            BigDecimal purchaseProfit
+                    = priceOnSelling.subtract(purchaseInfo.getPrice());
+            securityProfit = securityProfit.add(purchaseProfit);
+        }
+        security.setTotalCost(security.getTotalCost().add(securityProfit));
+        portfolio.setTotalCost(portfolio.getTotalCost().add(securityProfit));
+    }
 }

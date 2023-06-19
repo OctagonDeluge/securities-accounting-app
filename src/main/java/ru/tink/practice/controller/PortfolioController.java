@@ -20,11 +20,9 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    private final Integer PAGE_SIZE = 10;
-
     @GetMapping
-    public List<Portfolio> getPortfolios(Authentication authentication, @RequestParam Integer page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+    public List<Portfolio> getPortfolios(Authentication authentication, @RequestParam Integer page, @RequestParam Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         return portfolioService
                 .getAllPortfolios((SecurityUser) authentication.getPrincipal(), pageable)
                 .getContent();

@@ -1,20 +1,15 @@
 import {useState} from 'react';
-import {createStyles, Header, Group, ActionIcon, Container, Burger, Anchor} from '@mantine/core';
+import {Anchor, Avatar, Burger, Container, createStyles, Group, Header} from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
-import {
-    IconBrandGithub,
-    IconBrandAmongus,
-    IconBrandTelegram
-} from '@tabler/icons';
 import {useNavigate} from "react-router-dom";
-import {contacts} from "../../constants/AuthorContacts";
+import {Wallet} from "../elements/Wallet";
+import {AvatarMenu} from "../elements/AvatarMenu";
 
 const useStyles = createStyles((theme) => ({
     inner: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 56,
 
         [theme.fn.smallerThan('sm')]: {
             justifyContent: 'flex-start',
@@ -22,7 +17,7 @@ const useStyles = createStyles((theme) => ({
     },
 
     links: {
-        width: 260,
+        width: 315,
 
         [theme.fn.smallerThan('sm')]: {
             display: 'none',
@@ -30,7 +25,7 @@ const useStyles = createStyles((theme) => ({
     },
 
     social: {
-        width: 260,
+        width: 315,
 
         [theme.fn.smallerThan('sm')]: {
             width: 'auto',
@@ -69,11 +64,7 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-interface HeaderMiddleProps {
-    links: { link: string; label: string }[];
-}
-
-export function HeaderMiddle({links}: HeaderMiddleProps) {
+export function HeaderMiddle({service1, service, links}) {
     const [opened, {toggle}] = useDisclosure(false);
     const [active, setActive] = useState(links[0].link);
     const {classes, cx} = useStyles();
@@ -94,7 +85,7 @@ export function HeaderMiddle({links}: HeaderMiddleProps) {
     ));
 
     return (
-        <Header height={56}>
+        <Header height="5.5%">
             <Container className={classes.inner}>
                 <Burger opened={opened} onClick={toggle} size="sm" className={classes.burger}/>
                 <Group className={classes.links} spacing={5}>
@@ -102,15 +93,8 @@ export function HeaderMiddle({links}: HeaderMiddleProps) {
                 </Group>
 
                 <Group spacing={0} className={classes.social} position="right" noWrap>
-                    <ActionIcon size="lg">
-                        <IconBrandTelegram size={18} stroke={1.5}/>
-                    </ActionIcon>
-                    <ActionIcon size="lg">
-                        <IconBrandAmongus size={18} stroke={1.5}/>
-                    </ActionIcon>
-                    <ActionIcon component="a" href={contacts[0].link} size="lg">
-                        <IconBrandGithub size={18} stroke={1.5}/>
-                    </ActionIcon>
+                    <Wallet state={service.wallet}/>
+                    <AvatarMenu service={service1}/>
                 </Group>
             </Container>
         </Header>

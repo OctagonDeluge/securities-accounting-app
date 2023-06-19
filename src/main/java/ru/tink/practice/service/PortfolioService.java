@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.tink.practice.entity.Portfolio;
 import ru.tink.practice.entity.User;
+import ru.tink.practice.exception.PortfolioIsNotEmptyException;
 import ru.tink.practice.exception.PortfolioNotFoundException;
 import ru.tink.practice.repository.PortfolioRepository;
 import ru.tink.practice.security.SecurityUser;
@@ -14,6 +15,7 @@ import ru.tink.practice.security.SecurityUser;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,6 @@ public class PortfolioService {
     public Portfolio savePortfolio(SecurityUser securityUser, @NotBlank String portfolioName) {
         User user = userService.findUserByEmail(securityUser.getEmail());
         return portfolioRepository.save(new Portfolio(portfolioName,
-                BigDecimal.valueOf(0),
                 BigDecimal.valueOf(0),
                 user));
     }
@@ -49,12 +50,19 @@ public class PortfolioService {
 
     @Transactional
     public void deletePortfolio(SecurityUser securityUser, Long id) {
-        portfolioRepository.findByIdAndClientId(id, securityUser.getId())
-                        .orElseThrow(() -> new PortfolioNotFoundException(id));
+        Portfolio portfolio = portfolioRepository
+                .findByIdAndClientId(id, securityUser.getId())
+                .orElseThrow(() -> new PortfolioNotFoundException(id));
+        if(!portfolio.getSecurities().isEmpty())
+            throw new PortfolioIsNotEmptyException(portfolio.getName());
         portfolioRepository.deleteById(id);
     }
 
     public Page<Portfolio> getAllPortfolios(SecurityUser user, Pageable pageable) {
-        return portfolioRepository.findAllByClientId(user.getId(), pageable);
+        return portfolioRepository.findAllByClientIdOrderByIdDesc(user.getId(), pageable);
+    }
+
+    public List<Portfolio> getAllPortfolios() {
+        return portfolioRepository.findAll();
     }
 }

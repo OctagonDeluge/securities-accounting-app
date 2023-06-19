@@ -1,0 +1,8 @@
+.wallet {
+    display: flex;
+    border-radius: 10px;
+    padding: 5px;
+    align-items: center;
+    width: 315px;
+    margin-right: 20px;
+}

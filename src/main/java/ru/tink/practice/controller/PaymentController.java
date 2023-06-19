@@ -14,10 +14,17 @@ public class PaymentController {
 
     private final ExchangeIntegrationService exchangeIntegrationService;
 
-    @GetMapping("exchange/{exchangeName}/security/{secid}")
+    /*
+    * @GetMapping("exchange/{exchangeName}/security/{secid}")
     public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid,
                                                    @PathVariable String exchangeName,
                                                    @RequestParam Integer page) {
         return exchangeIntegrationService.getPaymentsBySecid(exchangeName, secid, page);
+    }
+    * */
+    @GetMapping("exchange/{exchangeName}/security/{secid}")
+    public List<PaymentDTO> getPaymentsForSecurity(@PathVariable String secid,
+                                                   @PathVariable String exchangeName) {
+        return exchangeIntegrationService.getPaymentsBySecid(exchangeName, secid);
     }
 }

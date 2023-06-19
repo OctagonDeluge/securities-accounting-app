@@ -6,7 +6,7 @@
 
 .securities {
     display: flex;
-    width: 70%;
+    width: 65%;
     justify-content: center;
     margin-top: 30px;
     flex-wrap: wrap;

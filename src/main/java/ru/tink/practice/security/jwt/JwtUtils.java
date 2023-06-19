@@ -29,7 +29,7 @@ public class JwtUtils {
         return generateTokenFromUsername(userPrincipal.getUsername());
     }
 
-    public String getCleanJwtCookie() {
+    public String getCleanJwt() {
         return TOKEN_TYPE;
     }
 
@@ -46,7 +46,7 @@ public class JwtUtils {
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
+            log.error("Expired JWT token");
         } catch (UnsupportedJwtException e) {
             log.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {

@@ -11,14 +11,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.tink.practice.dto.TokenRefreshDTO;
 import ru.tink.practice.dto.UserDTO;
+import ru.tink.practice.dto.request.ChangePasswordRequest;
 import ru.tink.practice.entity.RefreshToken;
+import ru.tink.practice.entity.Wallet;
 import ru.tink.practice.security.SecurityUser;
 import ru.tink.practice.security.SigninRequest;
 import ru.tink.practice.security.SignupRequest;
 import ru.tink.practice.security.jwt.JwtUtils;
 import ru.tink.practice.service.RefreshTokenService;
 import ru.tink.practice.service.UserService;
+import ru.tink.practice.service.WalletService;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
@@ -26,13 +30,15 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final WalletService walletService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signupUser(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<String> signupUser(@Valid @RequestBody SignupRequest signupRequest) {
         return userService.save(signupRequest);
     }
 
@@ -44,34 +50,30 @@ public class AuthController {
         SecurityUser userDetails = (SecurityUser) authentication.getPrincipal();
         userService.signinUser(userDetails.getEmail());
         String jwt = jwtUtils.generateJwt(userDetails);
-        RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
-        if(refreshToken == null) {
-           refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-        }
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(userDetails.getId());
+        Wallet wallet = walletService.getWalletByClientId(userDetails.getId());
         return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwt)
                 .body(new UserDTO(userDetails.getUsername(),
                         userDetails.getName(),
                         refreshToken.getToken(),
-                        userDetails.isEnabled()));
+                        userDetails.getLevel(),
+                        wallet
+                        ));
     }
 
     @PostMapping("/signout")
     public ResponseEntity<?> logout(Principal principal) {
         userService.signoutUser(principal.getName());
-        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwtUtils.getCleanJwtCookie())
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwtUtils.getCleanJwt())
                 .body("You've been signed out!");
     }
 
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<String> refreshToken(@RequestBody TokenRefreshDTO request) {
-        RefreshToken token = refreshTokenService
-                .findByToken(request.getRefreshToken());
-        token = refreshTokenService
-                .validateRefreshToken(token);
-        String newJwt = jwtUtils
-                .generateTokenFromUsername(token.getClient().getEmail());
         RefreshToken newRefreshToken = refreshTokenService
-                .updateRefreshToken(token.getClient(), token);
+                .updateRefreshToken(request.getRefreshToken());
+        String newJwt = jwtUtils
+                .generateTokenFromUsername(newRefreshToken.getClient().getEmail());
         return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, newJwt)
                 .body(newRefreshToken.getToken());
     }
