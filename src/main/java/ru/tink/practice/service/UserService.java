@@ -34,7 +34,6 @@ public class UserService {
     private final boolean NOT_AUTHENTICATED = false;
 
     public ResponseEntity<String> save(SignupRequest signupRequest) {
-        //:TODO email validation
         if (userRepository.findByEmail(signupRequest.getEmail()).isEmpty()) {
             User user = new User(signupRequest.getEmail(),
                     bCryptPasswordEncoder.encode(signupRequest.getPassword()),

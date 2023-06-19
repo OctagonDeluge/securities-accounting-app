@@ -103,7 +103,6 @@ public class TradingService {
     }
 
     @Transactional
-    //:TODO validate saleRequest quantity !< 1 price !<0
     public OperationInfoDTO sellSecurity(SecurityUser securityUser, SecuritySaleRequest saleRequest) {
         Security security = securityService
                 .getSecurity(securityUser, saleRequest.getSecurityId());

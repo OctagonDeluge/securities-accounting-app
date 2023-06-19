@@ -34,5 +34,4 @@ public class StatisticsController {
                 .getNumberOfSecuritiesOfEachType((SecurityUser) authentication.getPrincipal(),portfolioId);
     }
 
-    //:TODO add rating of users endpoint
 }

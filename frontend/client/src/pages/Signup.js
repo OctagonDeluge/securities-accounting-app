@@ -101,9 +101,9 @@ export function Signup() {
                         onChange={event => setSignupRequestData({...signupRequestData, level: event})}
                     />
                     <PasswordInput required={true} name="password" value={signupRequestData.password} label="Пароль"
-                                   placeholder="Пароль" onChange={event => handleChange(event)}/>
+                                   placeholder="Пароль (6 знаков минимум)" onChange={event => handleChange(event)}/>
                     <PasswordInput required={true} name="repeatPassword" value={signupRequestData.repeatPassword} label="Повторите пароль"
-                                   placeholder="Пароль" onChange={event => handleChange(event)}/>
+                                   placeholder="Пароль (6 знаков минимум)" onChange={event => handleChange(event)}/>
 
                     <Button component="button"
                             onClick={() => signup()}>
