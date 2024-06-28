@@ -1,5 +1,3 @@
-
-
 create table portfolio (
                            id bigserial primary key,
                            name varchar(30),
