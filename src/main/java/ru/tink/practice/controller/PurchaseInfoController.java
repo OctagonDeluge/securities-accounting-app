@@ -1,11 +1,12 @@
 package ru.tink.practice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import ru.tink.practice.entity.PurchaseInfo;
+import ru.tink.practice.security.SecurityUser;
 import ru.tink.practice.service.PurchaseInfoService;
 
 import java.util.List;
@@ -15,11 +16,15 @@ import java.util.List;
 @RequestMapping("/purchaseInfo")
 public class PurchaseInfoController {
 
+    private final Integer PAGE_SIZE = 5;
+
     private final PurchaseInfoService purchaseInfoService;
 
-    @GetMapping
-    public List<PurchaseInfo> getPurchaseInfos(@RequestParam List<Long> purchaseIds) {
-        return purchaseInfoService.getAllPurchaseInfosById(purchaseIds);
+    @GetMapping("/security/{securityId}")
+    public List<PurchaseInfo> getPurchaseInfos(Authentication authentication, @PathVariable Long securityId) {
+        //Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return purchaseInfoService
+                .getAllPurchaseInfosById(securityId, (SecurityUser) authentication.getPrincipal());
     }
 
 }

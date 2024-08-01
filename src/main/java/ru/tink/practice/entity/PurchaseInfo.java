@@ -9,22 +9,29 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "purchase_info")
 public class PurchaseInfo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime purchaseDate;
     private BigDecimal price;
     private Integer quantity;
 
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
-
-    @ToString.Exclude
     @JsonIgnore
     @ManyToOne
     private Security security;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User client;
+
+    public PurchaseInfo(BigDecimal price, Integer quantity, Security security, User client) {
+        this.price = price;
+        this.quantity = quantity;
+        this.security = security;
+        this.client = client;
+    }
 }

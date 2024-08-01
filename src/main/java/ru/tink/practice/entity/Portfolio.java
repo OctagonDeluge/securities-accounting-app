@@ -16,16 +16,18 @@ public class Portfolio {
     private Long id;
     private String name;
     private BigDecimal totalCost;
-    private BigDecimal profit;
 
     @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Security> securities;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User client;
 
-    public Portfolio(String name, BigDecimal totalCost, BigDecimal profit) {
+    public Portfolio(String name, BigDecimal totalCost, User user) {
         this.name = name;
-        this.profit = profit;
         this.totalCost = totalCost;
+        this.client = user;
     }
 }

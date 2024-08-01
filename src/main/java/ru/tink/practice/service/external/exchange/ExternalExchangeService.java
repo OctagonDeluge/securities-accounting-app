@@ -9,13 +9,15 @@ import java.util.Map;
 public interface ExternalExchangeService {
     List<SecurityShortInfoDTO> getSecuritiesByName(String securityName);
 
-    List<PaymentDTO> getPaymentsBySecid(String secid);
-
     SecurityFullInfoDTO getSecurityBySecid(String secid);
 
     BigDecimal getCurrentSecurityPrice(String secid, String securityType);
 
     List<CurrentPriceDTO> getPriceStatisticsByNumberOfDays(String secid, Map<String, String> params);
 
-    String getServiceName();
+    List<PaymentDTO> getPaymentsBySecid(String secid);
+
+    List<DividendDTO> getDividendsInfo(String secid);
+
+    CouponsDTO getCouponsInfo(String secid);
 }

@@ -13,4 +13,6 @@ import java.util.List;
 public class CouponsDTO {
     @JsonProperty("coupons")
     List<CouponDTO> coupons;
+    @JsonProperty("amortizations")
+    List<AmortizationDTO> amortizations;
 }
