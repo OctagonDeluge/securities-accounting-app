@@ -1,0 +1,41 @@
+.portfolio {
+    width: 55%;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.portfolio:hover {
+    background: rgba(136, 136, 136, 0.2);
+}
+
+.interactiveIcon {
+    cursor: pointer;
+}
+
+.disabled-name {
+    width: 45%;
+}
+
+.enabled-name {
+    width: 45%;
+}
+
+.disabled-name textarea {
+    cursor: pointer;
+}
+
+
+.totalCost {
+    width: 45%;
+    margin-left: 10px;
+    text-align: center;
+}
+
+.actions {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+}
