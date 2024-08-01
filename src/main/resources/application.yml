@@ -1,27 +1,21 @@
 spring:
   datasource:
-    url: jdbc:h2:file:/data/investments;DATABASE_TO_UPPER=false
-    username: sa
-    password: password
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5444/investment_assets
+    username: postgres
+    password: postgres
   jpa:
     open-in-view: false
     properties:
       hibernate:
         default_schema: investments
-    database-platform: org.hibernate.dialect.H2Dialect
 
   flyway:
     enabled: true
     init-sqls: CREATE SCHEMA IF NOT EXISTS investments
     default-schema: investments
-    driver-class-name: org.h2.Driver
   jackson:
     deserialization:
       FAIL_ON_UNKNOWN_PROPERTIES: false
-  h2:
-    console:
-      enabled: true
 
 jwt:
   secret-key: b723a296891aaca9cb691a5c9c74f6ad8e1f29883547276bd9b7e72ca42faef63de1a4b7c5f1b5fee5ce4b9cdedbb54f8027f599a76dfb9f08f175f2309cc56f
