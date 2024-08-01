@@ -4,8 +4,7 @@ import {IconBriefcase, IconCircleCheck, IconEditCircle, IconTrash} from "@tabler
 import React, {forwardRef, useEffect, useRef, useState} from "react";
 import "../../assets/styles/PortfolioCardStyles.css"
 
-export const PortfolioCard =
-    forwardRef(function PortfolioCard({portfolio, deletePortfolio, updatePortfolio}, ref) {
+export function PortfolioCard({portfolio, deletePortfolio, updatePortfolio}) {
         const navigate = useNavigate();
         const [disabled, setDisabled] = useState(true);
         const [showConfirm, setShowConfirm] = useState(false);
@@ -17,7 +16,7 @@ export const PortfolioCard =
         }, [disabled])
 
         const focus = () => {
-            inputRef.current.focus();
+            inputRef.current.select();
         };
 
         const navigateToSecurityPage = () => {
@@ -26,7 +25,7 @@ export const PortfolioCard =
         }
 
         return (
-            <div key={portfolio.id} ref={ref} className="portfolio">
+            <div key={portfolio.id} className="portfolio">
                 <div className={disabled ? "disabled-name" : "enabled-name"} onClick={navigateToSecurityPage}>
                     <Textarea
                         ref={inputRef}
@@ -73,4 +72,4 @@ export const PortfolioCard =
                 </div>
             </div>
         )
-    });
+    }

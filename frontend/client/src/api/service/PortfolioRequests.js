@@ -4,7 +4,7 @@ import {showNotification} from "@mantine/notifications";
 import {IconCircleCheck, IconCircleX} from "@tabler/icons";
 import React, {useState} from "react";
 
-const PAGE_SIZE = 9;
+export const PAGE_SIZE = 12;
 
 export function PortfolioService() {
     const [portfolios, setPortfolios] = useState([]);
@@ -12,6 +12,7 @@ export function PortfolioService() {
     const [hasMore, setHasMore] = useState(true);
 
     const getPortfolios = (page) => {
+        setLoading(true)
         axios
             .get(`${API_URL}/portfolio`, {
                 params: {

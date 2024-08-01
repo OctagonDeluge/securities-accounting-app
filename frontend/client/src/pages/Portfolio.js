@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import "../assets/styles/PortfoliosStyle.css"
 import "../assets/styles/PortfolioCardStyles.css"
 import {PortfolioService} from "../api/service/PortfolioRequests";
@@ -7,7 +7,7 @@ import {PortfolioAddCard} from "../components/cards/PortfolioAddCard";
 
 export function Portfolio() {
     const [page, setPage] = useState(0);
-    const service= PortfolioService();
+    const service = PortfolioService();
 
     useEffect(() => {
         const d = setTimeout(() => {
@@ -15,30 +15,25 @@ export function Portfolio() {
         }, 500);
     }, [page])
 
-    const observer = useRef();
-
-    const lastPortfolioRef = useCallback(el => {
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && service.hasMore) {
-                setPage(prevState => prevState + 1);
-            }
-        })
-        if (el) observer.current.observe(el)
-    }, [service.loading, service.hasMore]);
-
+    const handleScroll = (e) => {
+        const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+        if (bottom) {
+            setPage((prevState) => prevState+1);
+        }
+    }
 
     return (
         <div className="portfolioMain">
             <PortfolioAddCard createPortfolio={service.postPortfolio}/>
-            <div className="portfolios">
-                {service.portfolios.map(portfolio => (
-                    <PortfolioCard portfolio={portfolio}
-                                   key={portfolio.id}
-                                   updatePortfolio={service.updatePortfolio}
-                                   deletePortfolio={service.deletePortfolio}/>
-                ))}
-            </div>
+                <div className="portfolios" onScroll={handleScroll}>
+                    {service.portfolios.map((portfolio, index) => (
+                        <PortfolioCard portfolio={portfolio}
+                                       key={portfolio.id}
+                                       updatePortfolio={service.updatePortfolio}
+                                       deletePortfolio={service.deletePortfolio}/>
+                    ))}
+                </div>
+            {service.loading ? <h4>Загрузка</h4> : ""}
         </div>
     )
 }
