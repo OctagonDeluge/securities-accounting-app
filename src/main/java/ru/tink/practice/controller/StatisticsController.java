@@ -31,7 +31,7 @@ public class StatisticsController {
     @GetMapping("portfolio/{portfolioId}")
     public List<StatisticDTO> getCount(Authentication authentication, @PathVariable Long portfolioId) {
         return securityService
-                .getNumberOfSecuritiesOfEachType((SecurityUser) authentication.getPrincipal(),portfolioId);
+                .getNumberOfSecuritiesOfEachType((SecurityUser) authentication.getPrincipal(), portfolioId);
     }
 
 }
