@@ -10,9 +10,7 @@ export function Portfolio() {
     const service = PortfolioService();
 
     useEffect(() => {
-        const d = setTimeout(() => {
             service.getPortfolios(page);
-        }, 500);
     }, [page])
 
     const handleScroll = (e) => {

@@ -1,7 +1,7 @@
 import {ActionIcon, Textarea} from '@mantine/core';
 import {useNavigate} from "react-router-dom";
 import {IconBriefcase, IconCircleCheck, IconEditCircle, IconTrash} from "@tabler/icons"
-import React, {forwardRef, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../../assets/styles/PortfolioCardStyles.css"
 
 export function PortfolioCard({portfolio, deletePortfolio, updatePortfolio}) {
