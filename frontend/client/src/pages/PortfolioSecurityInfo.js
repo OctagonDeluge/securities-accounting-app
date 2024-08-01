@@ -131,8 +131,8 @@ export function PortfolioSecurityInfo({state}) {
             </Table>
             <Modal opened={opened} onClose={() => setOpened(false)} title='Укажите количество ценных бумаг'>
                 <Text>Цена продажи составит {exchangeService.price}</Text>
-                <IconRefresh onClick={() => exchangeService.request(security.secid, security.group)}/>
-
+                <IconRefresh style={{cursor:"pointer"}}
+                             onClick={() => exchangeService.request(security.secid, security.group)}/>
                 <NumberInput
                     style={{paddingBottom: 20}}
                     value={number}
