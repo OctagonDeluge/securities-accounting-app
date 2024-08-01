@@ -1,0 +1,28 @@
+.exchange {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.searchSection {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.searchSection button {
+    margin-left: 10px;
+}
+
+.searchSection input {
+    width: 400px;
+}
+
+.searchResult {
+    margin-top: 20px;
+    width: 70%;
+}
+
+.searchResult tr {
+    cursor: pointer;
+}

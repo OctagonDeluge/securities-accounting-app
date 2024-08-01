@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
-import axios from "axios";
+import React, {useState} from "react";
 import {IconSearch} from "@tabler/icons";
-import {Autocomplete, ScrollArea, Table, Button} from "@mantine/core";
+import {Autocomplete, Table} from "@mantine/core";
 import {SecurityShortInfoCard} from "../components/cards/SecurityShortInfoCard";
 import {TabsHeader} from "../components/headers/TabsHeader";
 import "../assets/styles/ExchangeStyles.css"
