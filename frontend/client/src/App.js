@@ -4,7 +4,6 @@ import {Portfolio} from "./pages/Portfolio";
 import {Security} from "./pages/Security";
 import {Exchange} from "./pages/Exchange";
 import {ExchangeSecurityInfo} from "./pages/ExchangeSecurityInfo";
-import {HeaderMiddle} from "./components/headers/HeaderMiddle";
 import React from "react";
 import {links} from "./constants/HeaderLinks";
 import {PortfolioSecurityInfo} from "./pages/PortfolioSecurityInfo";
@@ -16,6 +15,7 @@ import {useWalletService} from "./api/service/WalletService";
 import {useAccountService} from "./api/service/AccountService";
 import {History} from "./pages/History";
 import {Profile} from "./pages/Profile";
+import {CustomHeader} from "./components/headers/CustomHeader";
 
 export function App() {
     const walletService = useWalletService();
@@ -24,7 +24,7 @@ export function App() {
         <div className="App">
             {accountService.auth ?
                     <>
-                        <HeaderMiddle service1={accountService} service={walletService} links={links}/>
+                        <CustomHeader service1={accountService} service={walletService} links={links} />
                         <Routes>
                             <Route path="/portfolio" element={<Portfolio/>} />
                             <Route path="/portfolio/:portfolioId/exchange" element={<Exchange/>} />

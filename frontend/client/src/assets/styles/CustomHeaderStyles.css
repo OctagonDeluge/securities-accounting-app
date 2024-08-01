@@ -1,0 +1,36 @@
+@media(max-width: 700px) {
+    .tabs {
+
+    }
+}
+
+.link {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #2f2f2f;
+    font-weight: 500;
+}
+
+.link:hover {
+    background: rgba(136, 136, 136, 0.1);
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.76);
+    padding-left: 30px;
+    padding-right: 30px;
+    align-items: center;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+}

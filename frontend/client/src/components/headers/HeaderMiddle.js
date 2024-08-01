@@ -66,8 +66,8 @@ const useStyles = createStyles((theme) => ({
 
 export function HeaderMiddle({service1, service, links}) {
     const [opened, {toggle}] = useDisclosure(false);
-    const [active, setActive] = useState(links[0].link);
     const {classes, cx} = useStyles();
+    const [active, setActive] = useState(links[0].link);
     const navigate = useNavigate();
 
     const items = links.map((link) => (
@@ -91,7 +91,6 @@ export function HeaderMiddle({service1, service, links}) {
                 <Group className={classes.links} spacing={5}>
                     {items}
                 </Group>
-
                 <Group spacing={0} className={classes.social} position="right" noWrap>
                     <Wallet state={service.wallet}/>
                     <AvatarMenu service={service1}/>
