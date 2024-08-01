@@ -15,7 +15,6 @@ export function TabsHeader({tab}) {
             <Tabs.List>
                 <Tabs.Tab value="security">Ценные бумаги</Tabs.Tab>
                 <Tabs.Tab value="exchange">Поиск</Tabs.Tab>
-                <Tabs.Tab value="statistics">Статистика</Tabs.Tab>
             </Tabs.List>
         </Tabs>
     )
