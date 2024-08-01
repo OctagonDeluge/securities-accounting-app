@@ -64,7 +64,8 @@ public class AuthController {
     @PostMapping("/signout")
     public ResponseEntity<?> logout(Principal principal) {
         userService.signoutUser(principal.getName());
-        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwtUtils.getCleanJwt())
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, jwtUtils.getCleanJwt())
                 .body("You've been signed out!");
     }
 
