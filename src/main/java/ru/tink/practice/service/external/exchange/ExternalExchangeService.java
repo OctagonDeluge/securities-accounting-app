@@ -18,5 +18,6 @@ public interface ExternalExchangeService {
     List<PaymentDTO> getPaymentsBySecid(String secid);
 
     List<DividendDTO> getDividendsInfo(String secid);
+
     CouponsDTO getCouponsInfo(String secid);
 }
