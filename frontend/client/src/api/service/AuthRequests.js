@@ -80,10 +80,10 @@ export function useSignoutRequest() {
     const navigate = useNavigate();
 
     const request = () => {
+        localStorage.clear();
             axios
             .post(`${API_URL}/auth/signout`)
             .then(() => {
-                localStorage.clear();
                 navigate("/signin");
             });
     }
