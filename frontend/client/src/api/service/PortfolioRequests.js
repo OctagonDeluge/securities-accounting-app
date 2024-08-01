@@ -2,7 +2,7 @@ import {axios} from "../axios";
 import {API_URL} from "../../constants/API";
 import {showNotification} from "@mantine/notifications";
 import {IconCircleCheck, IconCircleX} from "@tabler/icons";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 const PAGE_SIZE = 9;
 
@@ -41,7 +41,7 @@ export function PortfolioService() {
             })
     }
 
-    const putPortfolio = (portfolio, name) => {
+    const updatePortfolio = (portfolio, name) => {
         axios
             .put(`${API_URL}/portfolio/${portfolio.id}`, {}, {
                 params: {
@@ -86,7 +86,7 @@ export function PortfolioService() {
             })
     }
 
-    return {getPortfolios, postPortfolio, putPortfolio, deletePortfolio, portfolios, loading, hasMore};
+    return {getPortfolios, postPortfolio, updatePortfolio, deletePortfolio, portfolios, loading, hasMore};
 }
 
 

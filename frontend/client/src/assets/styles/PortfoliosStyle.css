@@ -7,10 +7,12 @@
 }
 
 .portfolios {
-    width: 60%;
+    margin-top: 10px;
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+    overflow: scroll;
 }
 
 .table-header thead, tr {
