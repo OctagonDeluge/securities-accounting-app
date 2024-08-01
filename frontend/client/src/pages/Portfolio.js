@@ -1,19 +1,13 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import "../assets/styles/PortfoliosStyle.css"
-import "../assets/styles/IconStyles.css"
-import {ActionIcon, Table, TextInput} from "@mantine/core";
+import "../assets/styles/PortfolioCardStyles.css"
+import {PortfolioService} from "../api/service/PortfolioRequests";
 import {PortfolioCard} from "../components/cards/PortfolioCard";
-import {IconBriefcase, IconCirclePlus} from "@tabler/icons"
-import {
-    PortfolioService
-} from "../api/service/PortfolioRequests";
+import {PortfolioAddCard} from "../components/cards/PortfolioAddCard";
 
 export function Portfolio() {
-    const TEMPLATE = "Изменить имя"
-    const [name, setName] = useState(TEMPLATE);
     const [page, setPage] = useState(0);
-    const service
-        = PortfolioService();
+    const service= PortfolioService();
 
     useEffect(() => {
         const d = setTimeout(() => {
@@ -24,10 +18,10 @@ export function Portfolio() {
     const observer = useRef();
 
     const lastPortfolioRef = useCallback(el => {
-        if(observer.current) observer.current.disconnect();
+        if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
-            if(entries[0].isIntersecting && service.hasMore) {
-                setPage(prevState => prevState+1);
+            if (entries[0].isIntersecting && service.hasMore) {
+                setPage(prevState => prevState + 1);
             }
         })
         if (el) observer.current.observe(el)
@@ -36,55 +30,14 @@ export function Portfolio() {
 
     return (
         <div className="portfolioMain">
+            <PortfolioAddCard createPortfolio={service.postPortfolio}/>
             <div className="portfolios">
-                <Table className="table-header">
-                    <thead>
-                    <tr>
-                        <th>Портфель</th>
-                        <th>Общая стоимость</th>
-                        <th/>
-                        <th/>
-                        <th/>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <TextInput
-                                onChange={event => setName(event.target.value)}
-                                onFocus={event => event.target.select()}
-                                variant={'unstyled'}
-                                value={name}
-                                icon={<IconBriefcase/>}/>
-                        </td>
-                        <td>
-                            <ActionIcon onClick={() => {service.postPortfolio(name); setName(TEMPLATE)}}>
-                                <IconCirclePlus className='interactiveIcon'
-                                                color={'#32862d'}/>
-                            </ActionIcon>
-                        </td>
-                    </tr>
-                    </tbody>
-                </Table>
-                <Table className="table-body">
-                    <tbody>
-                    {
-                        service.portfolios.map((portfolio, index) => {
-                            if(service.portfolios.length-1 === index) {
-                                return <PortfolioCard ref={lastPortfolioRef} key={portfolio.id} portfolio={portfolio}
-                                                      deletePortfolio={service.deletePortfolio}
-                                                      updatePortfolio={service.putPortfolio}/>
-                            }
-                            else {
-                                return <PortfolioCard key={portfolio.id} portfolio={portfolio}
-                                                      deletePortfolio={service.deletePortfolio}
-                                                      updatePortfolio={service.putPortfolio}/>
-                            }
-                        })
-                    }
-                    <tr><td>{service.loading && 'Loading...'}</td></tr>
-                    </tbody>
-                </Table>
+                {service.portfolios.map(portfolio => (
+                    <PortfolioCard portfolio={portfolio}
+                                   key={portfolio.id}
+                                   updatePortfolio={service.updatePortfolio}
+                                   deletePortfolio={service.deletePortfolio}/>
+                ))}
             </div>
         </div>
     )
