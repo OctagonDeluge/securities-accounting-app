@@ -3,6 +3,7 @@ package ru.tink.practice.service.external.exchange.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,6 +19,7 @@ import ru.tink.practice.service.external.exchange.ExternalExchangeService;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -152,7 +154,8 @@ public class MoexExternalExchangeService implements ExternalExchangeService {
                 .queryParam("group_by_filter", securityType)
                 .queryParam("group_by", "group")
                 .queryParam("limit", 20)
-                .queryParam("q", securityName).build().toUri();
+                .queryParam("q", securityName)
+                .encode(StandardCharsets.UTF_8).build().toUri();
         return restTemplate.getForObject(destUrl, SecuritiesShortInfoDTO[].class);
     }
 
