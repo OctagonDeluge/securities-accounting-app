@@ -45,10 +45,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPointImpl()).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests().antMatchers("/auth/**","/test/**").permitAll()
+                .exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPointImpl())
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeHttpRequests().antMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());
