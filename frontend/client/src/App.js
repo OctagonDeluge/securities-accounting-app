@@ -1,5 +1,5 @@
 import './App.css';
-import {Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import {Portfolio} from "./pages/Portfolio";
 import {Security} from "./pages/Security";
 import {Exchange} from "./pages/Exchange";
@@ -8,7 +8,6 @@ import React from "react";
 import {links} from "./constants/HeaderLinks";
 import {PortfolioSecurityInfo} from "./pages/PortfolioSecurityInfo";
 import {Statistics} from "./pages/Statistics";
-import {NotFound} from "./pages/NotFound";
 import {Signup} from "./pages/Signup";
 import {Signin} from "./pages/Signin";
 import {useWalletService} from "./api/service/WalletService";
@@ -24,7 +23,7 @@ export function App() {
         <div className="App">
             {accountService.auth ?
                     <>
-                        <CustomHeader service1={accountService} service={walletService} links={links} />
+                        <CustomHeader accountService={accountService} walletService={walletService} links={links} />
                         <Routes>
                             <Route path="/portfolio" element={<Portfolio/>} />
                             <Route path="/portfolio/:portfolioId/exchange" element={<Exchange/>} />
@@ -34,12 +33,13 @@ export function App() {
                             <Route path="/portfolio/:portfolioId/exchange/:exchange/security/:secid" element={<ExchangeSecurityInfo state={walletService}/>} />
                             <Route path="/history" element={<History/>} />
                             <Route path="/profile" element={<Profile/>} />
+                            <Route path="*" element={<Navigate to={"/portfolio"}/>} />
                         </Routes>
                     </> :
                 <Routes>
                     <Route path="/signup" element={<Signup/>} />
                     <Route path="/signin" element={<Signin auth={accountService} wallet={walletService}/>} />
-                    <Route path="*" element={<NotFound/>} />
+                    <Route path="*" element={<Navigate to={"/signin"} />} />
                 </Routes>
             }
         </div>
