@@ -5,7 +5,7 @@ import {Wallet} from "../elements/Wallet";
 import {AvatarMenu} from "../elements/AvatarMenu";
 import "../../assets/styles/CustomHeaderStyles.css"
 
-export function CustomHeader({links, service, service1}) {
+export function CustomHeader({links, walletService, accountService}) {
     const [active, setActive] = useState(links[0].link);
     const navigate = useNavigate();
 
@@ -30,8 +30,8 @@ export function CustomHeader({links, service, service1}) {
                 {items}
             </div>
             <div className="info">
-                <Wallet state={service.wallet}/>
-                <AvatarMenu service={service1}/>
+                <Wallet state={walletService.wallet}/>
+                <AvatarMenu service={accountService}/>
             </div>
         </div>
     )
